@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-BackendAmayaApplication<Backend-Amaya>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.distribuidoraamaya.Backend_Amaya.BackendAmayaApplication",
+            "projectName": "Backend-Amaya",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
