@@ -1,0 +1,199 @@
+<div class="movimientos">
+  @if (movimientoViendo()) {
+    <div class="modal-overlay" (click)="cerrarDetalle()" role="presentation">
+      <div class="modal modal-view" role="dialog" aria-modal="true" aria-labelledby="modal-movimiento-titulo" tabindex="-1" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header-view">
+          <div class="modal-icon modal-icon-view">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"/>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+              <polyline points="7 23 3 19 7 15"/>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+            </svg>
+          </div>
+          <div class="modal-header-text">
+            <h2 id="modal-movimiento-titulo">Detalle del movimiento</h2>
+            <p>Información completa del registro</p>
+          </div>
+          <button class="modal-cerrar-x" (click)="cerrarDetalle()" title="Cerrar" aria-label="Cerrar modal">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body modal-body-view">
+          <div class="view-row"><span class="view-label">ID</span><span class="view-value">{{ movimientoViendo()!.id }}</span></div>
+          <div class="view-row"><span class="view-label">Fecha</span><span class="view-value">{{ movimientoViendo()!.fecha | date:'dd/MM/yyyy HH:mm' }}</span></div>
+          <div class="view-row">
+            <span class="view-label">Tipo</span>
+            <span class="view-value">
+              @if (movimientoViendo()!.tipo === 'ENTRADA') {
+                <span class="badge activo"><span class="badge-dot"></span>Entrada</span>
+              } @else {
+                <span class="badge inactivo"><span class="badge-dot"></span>Salida</span>
+              }
+            </span>
+          </div>
+          <div class="view-row"><span class="view-label">Producto</span><span class="view-value view-value-strong">{{ movimientoViendo()!.nombreProducto }}</span></div>
+          <div class="view-row"><span class="view-label">Código</span><span class="view-value"><span class="codigo-badge">{{ movimientoViendo()!.codigoProducto }}</span></span></div>
+          <div class="view-row"><span class="view-label">Almacén</span><span class="view-value">{{ movimientoViendo()!.nombreAlmacen || '—' }}</span></div>
+          <div class="view-row">
+            <span class="view-label">Cantidad</span>
+            <span class="view-value">
+              <span class="cantidad-badge">{{ movimientoViendo()!.cantidad }} {{ movimientoViendo()!.unidadMedida }}</span>
+            </span>
+          </div>
+          <div class="view-row"><span class="view-label">Stock antes</span><span class="view-value">{{ movimientoViendo()!.stockAnterior }}</span></div>
+          <div class="view-row"><span class="view-label">Stock después</span><span class="view-value view-value-strong">{{ movimientoViendo()!.stockNuevo }}</span></div>
+          <div class="view-row"><span class="view-label">Usuario</span><span class="view-value">{{ movimientoViendo()!.usuario || '—' }}</span></div>
+          <div class="view-row"><span class="view-label">Observación</span><span class="view-value">{{ movimientoViendo()!.observacion || '—' }}</span></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" (click)="cerrarDetalle()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <nav class="breadcrumbs" aria-label="Ruta de navegación">
+    <span>Inicio</span>
+    <span class="sep">/</span>
+    <span class="actual">Movimientos</span>
+  </nav>
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-icon">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="17 1 21 5 17 9"/>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+          <polyline points="7 23 3 19 7 15"/>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Movimientos</h1>
+        <p>Historial completo de entradas y salidas generadas por comprobantes</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="buscador">
+      <svg class="buscador-icono" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="buscador-input" placeholder="Buscar por producto, código, almacén, usuario u observación..." [value]="busqueda()" (input)="onBuscar($event)" />
+      @if (busqueda()) {
+        <button class="buscador-limpiar" (click)="limpiarBusqueda()" title="Limpiar" aria-label="Limpiar búsqueda">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="filtros-rapidos" role="group" aria-label="Filtrar por tipo de movimiento">
+    <button type="button" class="chip" [class.activo]="filtroTipo() === 'TODOS'" (click)="cambiarFiltro('TODOS')">
+      Todos <span class="chip-count">{{ conteos().todos }}</span>
+    </button>
+    <button type="button" class="chip" [class.activo]="filtroTipo() === 'ENTRADA'" (click)="cambiarFiltro('ENTRADA')">
+      Entradas <span class="chip-count">{{ conteos().entradas }}</span>
+    </button>
+    <button type="button" class="chip" [class.activo]="filtroTipo() === 'SALIDA'" (click)="cambiarFiltro('SALIDA')">
+      Salidas <span class="chip-count">{{ conteos().salidas }}</span>
+    </button>
+  </div>
+
+  @if (cargando()) {
+    <div class="skeleton-wrapper">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="skeleton-row">
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell wide"></div>
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell small"></div>
+        </div>
+      }
+    </div>
+  } @else {
+    @if (movimientos().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          </svg>
+        </div>
+        <h3>Aún no hay movimientos registrados</h3>
+        <p>Los movimientos se generan automáticamente al registrar comprobantes de compra o venta.</p>
+        <p class="empty-detalle">Crea un comprobante de compra para ingresar mercadería y verás el registro aquí.</p>
+      </div>
+    } @else if (movimientosFiltrados().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Sin resultados</h3>
+        <p>No hay movimientos que coincidan con los filtros aplicados.</p>
+        <button class="btn-secondary" (click)="limpiarBusqueda(); cambiarFiltro('TODOS')">Limpiar filtros</button>
+      </div>
+    } @else {
+      <div class="tabla-wrapper">
+        <table class="tabla">
+          <caption class="sr-only">Listado de movimientos de inventario</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="col-fecha th-sort" (click)="ordenarPor('fecha')">
+                Fecha <span class="sort-icon">{{ iconoOrden('fecha') }}</span>
+              </th>
+              <th scope="col" class="th-sort" (click)="ordenarPor('producto')">
+                Producto <span class="sort-icon">{{ iconoOrden('producto') }}</span>
+              </th>
+              <th scope="col" class="col-codigo">Código</th>
+              <th scope="col" class="col-almacen">Almacén</th>
+              <th scope="col" class="col-tipo">Tipo</th>
+              <th scope="col" class="col-cantidad th-sort" (click)="ordenarPor('cantidad')">
+                Cantidad <span class="sort-icon">{{ iconoOrden('cantidad') }}</span>
+              </th>
+              <th scope="col" class="col-stock">Stock antes</th>
+              <th scope="col" class="col-stock">Stock después</th>
+              <th scope="col" class="col-usuario">Usuario</th>
+              <th scope="col" class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of movimientosFiltrados(); track m.id) {
+              <tr>
+                <td class="col-fecha">{{ m.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td class="nombre-producto">{{ m.nombreProducto }}</td>
+                <td class="col-codigo"><span class="codigo-badge">{{ m.codigoProducto }}</span></td>
+                <td class="col-almacen">{{ m.nombreAlmacen || '—' }}</td>
+                <td class="col-tipo">
+                  @if (m.tipo === 'ENTRADA') {
+                    <span class="badge activo"><span class="badge-dot"></span>Entrada</span>
+                  } @else {
+                    <span class="badge inactivo"><span class="badge-dot"></span>Salida</span>
+                  }
+                </td>
+                <td class="col-cantidad"><span class="cantidad-badge">{{ m.cantidad }} {{ m.unidadMedida }}</span></td>
+                <td class="col-stock">{{ m.stockAnterior }}</td>
+                <td class="col-stock stock-nuevo">{{ m.stockNuevo }}</td>
+                <td class="col-usuario">{{ m.usuario || '—' }}</td>
+                <td class="col-acciones">
+                  <button class="btn-accion ver" (click)="verDetalle(m)" title="Ver detalle" aria-label="Ver detalle del movimiento">
+                    <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

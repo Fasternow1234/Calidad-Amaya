@@ -1,0 +1,100 @@
+<div class="home-wrapper" [class.modo-oscuro]="modoOscuro()">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="logo">DA</div>
+      <span>Distribuidora Amaya</span>
+    </div>
+    <div class="topbar-actions">
+      <button
+        type="button"
+        class="btn-tema"
+        (click)="toggleModoOscuro()"
+        [attr.aria-label]="modoOscuro() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+        [attr.title]="modoOscuro() ? 'Modo claro' : 'Modo oscuro'"
+      >
+        @if (modoOscuro()) {
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        } @else {
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        }
+      </button>
+      <div class="user-menu">
+        <button class="user-button" (click)="toggleMenu($event)">
+          <div class="user-avatar">
+            {{ usuario()?.nombreEmpleado?.charAt(0) ?? 'U' }}
+          </div>
+          <span class="user-name">{{ usuario()?.nombreEmpleado }}</span>
+          <span class="chevron" [class.open]="menuAbierto()">▾</span>
+        </button>
+        @if (menuAbierto()) {
+          <div class="dropdown" (click)="$event.stopPropagation()">
+            <div class="dropdown-header">
+              <strong>{{ usuario()?.nombreEmpleado }}</strong>
+              <small>{{ usuario()?.rol }}</small>
+            </div>
+            <button class="dropdown-item logout" (click)="cerrarSesion()">
+              Cerrar sesión
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+  <div class="body">
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        @for (item of menu(); track item.codigo) {
+          <button
+            class="nav-item"
+            [class.active]="seccionActiva() === item.codigo"
+            (click)="seleccionar(item.codigo)"
+          >
+            <span class="nav-icon">{{ item.icono }}</span>
+            <span class="nav-label">{{ item.nombre }}</span>
+          </button>
+        }
+      </nav>
+    </aside>
+    <main class="content">
+      @if (seccionActiva() === 'inicio') {
+        <div class="inicio">
+          <h1>¡Bienvenido, {{ usuario()?.nombreEmpleado }}!</h1>
+          <p>Selecciona una opción del menú para comenzar.</p>
+        </div>
+      }
+      @if (seccionActiva() === 'proveedores') {
+        <app-proveedores />
+      }
+      @if (seccionActiva() === 'categorias') {
+        <app-categorias />
+      }
+      @if (seccionActiva() === 'productos') {
+        <app-productos />
+      }
+      @if (seccionActiva() === 'almacenes') {
+        <app-almacenes />
+      }
+      @if (seccionActiva() === 'movimientos') {
+        <app-movimientos />
+      }
+      @if (seccionActiva() === 'comprobantes') {
+        <app-comprobantes />
+      }
+      @if (seccionActiva() === 'clientes') {
+        <app-clientes />
+      }
+    </main>
+  </div>
+</div>

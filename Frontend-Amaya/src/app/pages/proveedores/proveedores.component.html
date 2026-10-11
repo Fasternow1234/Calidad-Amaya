@@ -1,0 +1,417 @@
+<div class="proveedores">
+  @if (toast()) {
+    <div class="toast" [class.toast-success]="toast()!.tipo === 'success'" [class.toast-error]="toast()!.tipo === 'error'" role="alert">
+      <span class="toast-icon">
+        @if (toast()!.tipo === 'success') {
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        } @else {
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        }
+      </span>
+      <span class="toast-mensaje">{{ toast()!.mensaje }}</span>
+      @if (toast()!.accionLabel) {
+        <button type="button" class="toast-accion" (click)="ejecutarAccionToast()">
+          {{ toast()!.accionLabel }}
+        </button>
+      }
+      <button class="toast-cerrar" (click)="cerrarToast()" aria-label="Cerrar notificación">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  }
+
+  @if (proveedorViendo()) {
+    <div class="modal-overlay" (click)="cerrarVista()" role="presentation">
+      <div class="modal modal-view" role="dialog" aria-modal="true" aria-labelledby="modal-detalle-proveedor-titulo" tabindex="-1" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header-view">
+          <div class="modal-icon modal-icon-view">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="modal-header-text">
+            <h2 id="modal-detalle-proveedor-titulo">Detalle del proveedor</h2>
+            <p>Información completa del registro</p>
+          </div>
+          <button class="modal-cerrar-x" (click)="cerrarVista()" title="Cerrar" aria-label="Cerrar modal">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body modal-body-view">
+          <div class="view-row"><span class="view-label">ID</span><span class="view-value">{{ proveedorViendo()!.id }}</span></div>
+          <div class="view-row"><span class="view-label">RUC</span><span class="view-value"><span class="ruc-badge">{{ proveedorViendo()!.ruc }}</span></span></div>
+          <div class="view-row"><span class="view-label">Razón social</span><span class="view-value view-value-strong">{{ proveedorViendo()!.razonSocial }}</span></div>
+          <div class="view-row"><span class="view-label">Nombre comercial</span><span class="view-value">{{ proveedorViendo()!.nombreComercial || '—' }}</span></div>
+          <div class="view-row"><span class="view-label">Dirección</span><span class="view-value">{{ proveedorViendo()!.direccion || '—' }}</span></div>
+          <div class="view-row"><span class="view-label">Teléfono</span><span class="view-value">{{ proveedorViendo()!.telefono || '—' }}</span></div>
+          <div class="view-row"><span class="view-label">Email</span><span class="view-value">{{ proveedorViendo()!.email || '—' }}</span></div>
+          <div class="view-row">
+            <span class="view-label">Estado</span>
+            <span class="view-value">
+              @if (proveedorViendo()!.estado === 1) {
+                <span class="badge activo"><span class="badge-dot"></span>Activo</span>
+              } @else {
+                <span class="badge inactivo"><span class="badge-dot"></span>Inactivo</span>
+              }
+            </span>
+          </div>
+          <div class="view-row"><span class="view-label">Fecha de registro</span><span class="view-value">{{ proveedorViendo()!.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" (click)="cerrarVista()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (confirmacion()) {
+    <div class="modal-overlay" (click)="cancelarConfirmacion()" role="presentation">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-confirmar-titulo" tabindex="-1" (click)="$event.stopPropagation()">
+        <div class="modal-header" [class.modal-header-danger]="confirmacion()!.accion === 'eliminar'">
+          <div class="modal-icon">
+            @if (confirmacion()!.accion === 'eliminar') {
+              <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            } @else {
+              <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            }
+          </div>
+          <div class="modal-header-text">
+            <h2 id="modal-confirmar-titulo">{{ tituloConfirmacion() }}</h2>
+            <p>Esta acción requiere tu confirmación</p>
+          </div>
+        </div>
+        <div class="modal-body"><p>{{ mensajeConfirmacion() }}</p></div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" (click)="cancelarConfirmacion()" [disabled]="procesando()">Cancelar</button>
+          <button type="button" class="btn-modal-confirmar" [class.btn-danger]="confirmacion()!.accion === 'eliminar'" [class.btn-success]="confirmacion()!.accion === 'reactivar'" (click)="confirmarAccion()" [disabled]="procesando()">
+            {{ procesando() ? 'Procesando...' : (confirmacion()!.accion === 'eliminar' ? 'Sí, eliminar' : 'Sí, reactivar') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <nav class="breadcrumbs" aria-label="Ruta de navegación">
+    <span>Inicio</span>
+    <span class="sep">/</span>
+    <span class="actual">Proveedores</span>
+  </nav>
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-icon">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="15" height="13"/>
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+          <circle cx="5.5" cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Proveedores</h1>
+        <p>Empresas y contactos que abastecen el inventario</p>
+      </div>
+    </div>
+    <button class="btn-primary" (click)="abrirFormularioNuevo()" [disabled]="guardando()">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuevo proveedor
+    </button>
+  </div>
+
+  @if (formVisible()) {
+    <div class="form-card">
+      <div class="form-card-header">
+        <h2>{{ tituloFormulario() }}</h2>
+        <button type="button" class="btn-cerrar-form" (click)="cancelarFormulario()" aria-label="Cerrar formulario">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="form-body">
+
+        <div class="form-group form-group--wide">
+          <div class="form-label-row">
+            <label for="ruc">RUC <span class="requerido">*</span></label>
+            <span class="contador" [class.limite]="rucLargo() >= 11">{{ rucLargo() }}/11</span>
+          </div>
+          <div class="input-con-boton">
+            <div class="input-wrapper">
+              <input
+                id="ruc"
+                type="text"
+                formControlName="ruc"
+                placeholder="Ej: 20554382933"
+                maxlength="11"
+                inputmode="numeric"
+                autocomplete="off"
+                autofocus
+                (input)="onRucInput($event)"
+              />
+              @if (campoValido('ruc')) {
+                <span class="input-check" aria-label="Campo válido">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+              }
+            </div>
+            <button type="button" class="btn-buscar-ruc" (click)="buscarRuc()" [disabled]="buscandoRuc()" aria-label="Consultar RUC en SUNAT">
+              @if (buscandoRuc()) {
+                <span class="spinner-btn" aria-hidden="true"></span>
+                <span>Consultando...</span>
+              } @else {
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Consultar SUNAT</span>
+              }
+            </button>
+          </div>
+          @if (ruc.touched && ruc.invalid) {
+            <small class="error" role="alert">
+              @if (ruc.errors?.['required']) { El RUC es obligatorio }
+              @if (ruc.errors?.['rucInvalido']) { {{ ruc.errors?.['rucInvalido'] }} }
+            </small>
+          }
+          @if (rucError()) {
+            <small class="error" role="alert">{{ rucError() }}</small>
+          }
+        </div>
+
+        <div class="form-group form-group--wide">
+          <div class="form-label-row">
+            <label for="razonSocial">Razón social <span class="requerido">*</span></label>
+            <span class="contador" [class.limite]="razonLargo() >= 140">{{ razonLargo() }}/150</span>
+          </div>
+          <div class="input-wrapper">
+            <input id="razonSocial" type="text" formControlName="razonSocial" placeholder="Nombre legal de la empresa" autocomplete="off" />
+            @if (campoValido('razonSocial')) {
+              <span class="input-check" aria-label="Campo válido">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            }
+          </div>
+          @if (razonSocial.touched && razonSocial.invalid) {
+            <small class="error" role="alert">
+              @if (razonSocial.errors?.['required']) { La razón social es obligatoria }
+              @if (razonSocial.errors?.['maxlength']) { Máximo 150 caracteres }
+            </small>
+          }
+        </div>
+
+        <div class="form-group">
+          <div class="form-label-row">
+            <label for="nombreComercial">Nombre comercial <span class="opcional">(opcional)</span></label>
+            <span class="contador" [class.limite]="nombreComercialLargo() >= 140">{{ nombreComercialLargo() }}/150</span>
+          </div>
+          <input id="nombreComercial" type="text" formControlName="nombreComercial" placeholder="Nombre con el que se conoce" autocomplete="off" />
+          @if (nombreComercial.touched && nombreComercial.invalid) {
+            <small class="error" role="alert">Máximo 150 caracteres</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <div class="form-label-row">
+            <label for="telefono">Teléfono <span class="opcional">(opcional)</span></label>
+            <span class="contador" [class.limite]="telefonoLargo() >= 13">{{ telefonoLargo() }}/15</span>
+          </div>
+          <input
+            id="telefono"
+            type="text"
+            formControlName="telefono"
+            placeholder="Ej: 987654321"
+            inputmode="numeric"
+            autocomplete="off"
+            (input)="onTelefonoInput($event)"
+          />
+          @if (telefono.touched && telefono.invalid) {
+            <small class="error" role="alert">
+              @if (telefono.errors?.['telefonoInvalido']) { {{ telefono.errors?.['telefonoInvalido'] }} }
+            </small>
+          }
+        </div>
+
+        <div class="form-group">
+          <div class="form-label-row">
+            <label for="email">Email <span class="opcional">(opcional)</span></label>
+            <span class="contador" [class.limite]="emailLargo() >= 140">{{ emailLargo() }}/150</span>
+          </div>
+          <div class="input-wrapper">
+            <input id="email" type="email" formControlName="email" placeholder="contacto@proveedor.com" autocomplete="off" />
+            @if (campoValido('email')) {
+              <span class="input-check" aria-label="Campo válido">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            }
+          </div>
+          @if (email.touched && email.invalid) {
+            <small class="error" role="alert">
+              @if (email.errors?.['email']) { Formato de email inválido }
+              @if (email.errors?.['maxlength']) { Máximo 150 caracteres }
+            </small>
+          }
+        </div>
+
+        <div class="form-group form-group--wide">
+          <div class="form-label-row">
+            <label for="direccion">Dirección <span class="opcional">(opcional)</span></label>
+            <span class="contador" [class.limite]="direccionLargo() >= 180">{{ direccionLargo() }}/200</span>
+          </div>
+          <input id="direccion" type="text" formControlName="direccion" placeholder="Dirección fiscal o de almacén" autocomplete="off" />
+          @if (direccion.touched && direccion.invalid) {
+            <small class="error" role="alert">Máximo 200 caracteres</small>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="cancelarFormulario()">Cancelar</button>
+          <button type="submit" class="btn-primary-sm" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="toolbar">
+    <div class="buscador">
+      <svg class="buscador-icono" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="buscador-input" placeholder="Buscar por RUC, razón social, nombre comercial o email..." [value]="busqueda()" (input)="onBuscar($event)" />
+      @if (busqueda()) {
+        <button class="buscador-limpiar" (click)="limpiarBusqueda()" title="Limpiar" aria-label="Limpiar búsqueda">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      }
+    </div>
+    <label class="switch-inactivas">
+      <input type="checkbox" [checked]="mostrarInactivos()" (change)="toggleInactivos()" />
+      <span class="switch-track"><span class="switch-thumb"></span></span>
+      <span class="switch-label">Mostrar inactivos</span>
+    </label>
+  </div>
+
+  @if (cargando()) {
+    <div class="skeleton-wrapper">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="skeleton-row">
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell wide"></div>
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell small"></div>
+        </div>
+      }
+    </div>
+  } @else {
+    @if (proveedores().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"/>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <h3>Aún no tienes proveedores registrados</h3>
+        <p>Los proveedores son las empresas que te abastecen de productos.</p>
+        <p class="empty-detalle">Registra el primero para poder asociarlo a tus productos y comprobantes de compra.</p>
+        <button class="btn-primary-sm" (click)="abrirFormularioNuevo()">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Crear mi primer proveedor
+        </button>
+      </div>
+    } @else if (proveedoresFiltrados().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Sin resultados</h3>
+        <p>No hay proveedores que coincidan con los filtros aplicados.</p>
+        <button class="btn-secondary" (click)="limpiarBusqueda()">Limpiar filtros</button>
+      </div>
+    } @else {
+      <div class="tabla-wrapper">
+        <table class="tabla">
+          <caption class="sr-only">Listado de proveedores registrados</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="col-id">#</th>
+              <th scope="col" class="col-ruc th-sort" (click)="ordenarPor('ruc')">
+                RUC <span class="sort-icon">{{ iconoOrden('ruc') }}</span>
+              </th>
+              <th scope="col" class="th-sort" (click)="ordenarPor('razonSocial')">
+                Razón social <span class="sort-icon">{{ iconoOrden('razonSocial') }}</span>
+              </th>
+              <th scope="col" class="col-contacto">Contacto</th>
+              <th scope="col" class="col-estado">Estado</th>
+              <th scope="col" class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of proveedoresFiltrados(); track p.id) {
+              <tr [class.inactiva]="p.estado === 0">
+                <td class="col-id"><span class="id-badge">{{ p.id }}</span></td>
+                <td class="col-ruc"><span class="ruc-badge">{{ p.ruc }}</span></td>
+                <td>
+                  <div class="razon-cell">
+                    <div class="razon-icono" [class.inactiva]="p.estado === 0">
+                      {{ p.razonSocial.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="razon-texto">
+                      <span class="razon-social">{{ p.razonSocial }}</span>
+                      @if (p.nombreComercial) {
+                        <small class="nombre-comercial">{{ p.nombreComercial }}</small>
+                      }
+                    </div>
+                  </div>
+                </td>
+                <td class="col-contacto">
+                  @if (p.telefono) {
+                    <div class="contacto-linea">
+                      <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                      {{ p.telefono }}
+                    </div>
+                  }
+                  @if (p.email) {
+                    <div class="contacto-linea">
+                      <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                      {{ p.email }}
+                    </div>
+                  }
+                  @if (!p.telefono && !p.email) {
+                    <span class="sin-contacto">—</span>
+                  }
+                </td>
+                <td class="col-estado">
+                  @if (p.estado === 1) {
+                    <span class="badge activo"><span class="badge-dot"></span>Activo</span>
+                  } @else {
+                    <span class="badge inactivo"><span class="badge-dot"></span>Inactivo</span>
+                  }
+                </td>
+                <td class="col-acciones">
+                  <button class="btn-accion ver" (click)="verProveedor(p)" title="Ver detalle" aria-label="Ver detalle del proveedor">
+                    <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                  @if (p.estado === 1) {
+                    <button class="btn-accion editar" (click)="abrirFormularioEditar(p)" title="Editar" aria-label="Editar proveedor">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn-accion eliminar" (click)="pedirEliminar(p)" title="Eliminar" aria-label="Eliminar proveedor">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  } @else {
+                    <button class="btn-accion reactivar" (click)="pedirReactivar(p)" title="Reactivar" aria-label="Reactivar proveedor">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

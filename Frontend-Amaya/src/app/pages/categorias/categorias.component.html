@@ -1,0 +1,235 @@
+<div class="categorias">
+  @if (toast()) {
+    <div class="toast" [class.toast-success]="toast()!.tipo === 'success'" [class.toast-error]="toast()!.tipo === 'error'" role="alert">
+      <span class="toast-icon">
+        @if (toast()!.tipo === 'success') {
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        } @else {
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        }
+      </span>
+      <span class="toast-mensaje">{{ toast()!.mensaje }}</span>
+      @if (toast()!.accionLabel) {
+        <button type="button" class="toast-accion" (click)="ejecutarAccionToast()">
+          {{ toast()!.accionLabel }}
+        </button>
+      }
+      <button class="toast-cerrar" (click)="cerrarToast()" aria-label="Cerrar notificación">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  }
+
+  @if (confirmacion()) {
+    <div class="modal-overlay" (click)="cancelarConfirmacion()" role="presentation">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-confirmar-titulo" tabindex="-1" (click)="$event.stopPropagation()">
+        <div class="modal-header" [class.modal-header-danger]="confirmacion()!.accion === 'eliminar'">
+          <div class="modal-icon">
+            @if (confirmacion()!.accion === 'eliminar') {
+              <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            } @else {
+              <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            }
+          </div>
+          <div class="modal-header-text">
+            <h2 id="modal-confirmar-titulo">{{ tituloConfirmacion() }}</h2>
+            <p>Esta acción requiere tu confirmación</p>
+          </div>
+        </div>
+        <div class="modal-body"><p>{{ mensajeConfirmacion() }}</p></div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" (click)="cancelarConfirmacion()" [disabled]="procesando()">Cancelar</button>
+          <button type="button" class="btn-modal-confirmar" [class.btn-danger]="confirmacion()!.accion === 'eliminar'" [class.btn-success]="confirmacion()!.accion === 'reactivar'" (click)="confirmarAccion()" [disabled]="procesando()">
+            {{ procesando() ? 'Procesando...' : (confirmacion()!.accion === 'eliminar' ? 'Sí, eliminar' : 'Sí, reactivar') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <nav class="breadcrumbs" aria-label="Ruta de navegación">
+    <span>Inicio</span>
+    <span class="sep">/</span>
+    <span class="actual">Categorías</span>
+  </nav>
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-icon">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Categorías</h1>
+        <p>Clasifica los productos para organizar y filtrar el catálogo</p>
+      </div>
+    </div>
+    <button class="btn-primary" (click)="abrirFormularioNuevo()" [disabled]="guardando()">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nueva categoría
+    </button>
+  </div>
+
+  @if (formVisible()) {
+    <div class="form-card">
+      <div class="form-card-header">
+        <h2>{{ tituloFormulario() }}</h2>
+        <button type="button" class="btn-cerrar-form" (click)="cancelarFormulario()" aria-label="Cerrar formulario">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="form-body">
+        <div class="form-group">
+          <div class="form-label-row">
+            <label for="nombre">Nombre de la categoría <span class="requerido">*</span></label>
+            <span class="contador" [class.limite]="nombreLargo() >= 90">{{ nombreLargo() }}/100</span>
+          </div>
+          <div class="input-wrapper">
+            <input
+              id="nombre"
+              type="text"
+              formControlName="nombre"
+              placeholder="Ej: Bebidas, Alimentos, Limpieza, Laptops..."
+              autocomplete="off"
+              autofocus
+            />
+            @if (campoValido()) {
+              <span class="input-check" aria-label="Campo válido">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            }
+          </div>
+          @if (nombre.touched && nombre.invalid) {
+            <small class="error" role="alert">
+              @if (nombre.errors?.['required']) { El nombre es obligatorio }
+              @if (nombre.errors?.['maxlength']) { Máximo 100 caracteres }
+            </small>
+          }
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="cancelarFormulario()">Cancelar</button>
+          <button type="submit" class="btn-primary-sm" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="toolbar">
+    <div class="buscador">
+      <svg class="buscador-icono" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="buscador-input" placeholder="Buscar categoría por nombre..." [value]="busqueda()" (input)="onBuscar($event)" />
+      @if (busqueda()) {
+        <button class="buscador-limpiar" (click)="limpiarBusqueda()" title="Limpiar" aria-label="Limpiar búsqueda">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      }
+    </div>
+    <label class="switch-inactivas">
+      <input type="checkbox" [checked]="mostrarInactivas()" (change)="toggleInactivas()" />
+      <span class="switch-track"><span class="switch-thumb"></span></span>
+      <span class="switch-label">Mostrar inactivas</span>
+    </label>
+  </div>
+
+  @if (cargando()) {
+    <div class="skeleton-wrapper">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="skeleton-row">
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell wide"></div>
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell small"></div>
+        </div>
+      }
+    </div>
+  } @else {
+    @if (categorias().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <h3>Aún no tienes categorías registradas</h3>
+        <p>Las categorías te permiten agrupar productos por tipo o uso.</p>
+        <p class="empty-detalle">Crea la primera para empezar a organizar tu catálogo.</p>
+        <button class="btn-primary-sm" (click)="abrirFormularioNuevo()">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Crear mi primera categoría
+        </button>
+      </div>
+    } @else if (categoriasFiltradas().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Sin resultados</h3>
+        <p>No hay categorías que coincidan con los filtros aplicados.</p>
+        <button class="btn-secondary" (click)="limpiarBusqueda()">Limpiar filtros</button>
+      </div>
+    } @else {
+      <div class="tabla-wrapper">
+        <table class="tabla">
+          <caption class="sr-only">Listado de categorías registradas</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="col-id">#</th>
+              <th scope="col" class="th-sort" (click)="ordenarPor('nombre')">
+                Nombre <span class="sort-icon">{{ iconoOrden('nombre') }}</span>
+              </th>
+              <th scope="col" class="col-estado">Estado</th>
+              <th scope="col" class="col-fecha th-sort" (click)="ordenarPor('fecha')">
+                Fecha registro <span class="sort-icon">{{ iconoOrden('fecha') }}</span>
+              </th>
+              <th scope="col" class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of categoriasFiltradas(); track c.id) {
+              <tr [class.inactiva]="c.estado === 0">
+                <td class="col-id"><span class="id-badge">{{ c.id }}</span></td>
+                <td>
+                  <div class="nombre-cell">
+                    <div class="nombre-icono" [class.inactiva]="c.estado === 0">
+                      {{ c.nombre.charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="nombre">{{ c.nombre }}</span>
+                  </div>
+                </td>
+                <td class="col-estado">
+                  @if (c.estado === 1) {
+                    <span class="badge activo"><span class="badge-dot"></span>Activo</span>
+                  } @else {
+                    <span class="badge inactivo"><span class="badge-dot"></span>Inactivo</span>
+                  }
+                </td>
+                <td class="col-fecha">
+                  {{ c.fechaRegistro | date:'dd/MM/yyyy' }}
+                  <small>{{ c.fechaRegistro | date:'HH:mm' }}</small>
+                </td>
+                <td class="col-acciones">
+                  @if (c.estado === 1) {
+                    <button class="btn-accion editar" (click)="abrirFormularioEditar(c)" title="Editar" aria-label="Editar categoría">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn-accion eliminar" (click)="pedirEliminar(c)" title="Eliminar" aria-label="Eliminar categoría">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  } @else {
+                    <button class="btn-accion reactivar" (click)="pedirReactivar(c)" title="Reactivar" aria-label="Reactivar categoría">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

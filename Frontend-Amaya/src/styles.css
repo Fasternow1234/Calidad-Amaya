@@ -1,0 +1,331 @@
+:root {
+  --bg-app: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-soft: #f8fafc;
+  --bg-input: #ffffff;
+  --bg-hover: #f1f5f9;
+  --border: #d8dee9;
+  --border-soft: #e8edf3;
+  --text: #0f172a;
+  --text-soft: #334155;
+  --text-muted: #475569;
+  --text-faint: #64748b;
+  --text-placeholder: #94a3b8;
+  --shadow-sm: rgba(15, 23, 42, 0.06);
+  --shadow-md: rgba(15, 23, 42, 0.12);
+  --shadow-lg: rgba(15, 23, 42, 0.18);
+  --table-head: #f8fafc;
+  --table-hover: #f8fafc;
+  --overlay: rgba(15, 23, 42, 0.55);
+  --accent: #1976d2;
+  --accent-hover: #1565c0;
+  --accent-soft: #eff6ff;
+  --accent-border: #bfdbfe;
+  --accent-text: #1d4ed8;
+
+  --success: #10b981;
+  --success-dark: #047857;
+  --success-soft: rgba(16, 185, 129, 0.14);
+  --success-soft-hover: rgba(16, 185, 129, 0.22);
+  --success-border: rgba(16, 185, 129, 0.35);
+
+  --danger: #dc2626;
+  --danger-dark: #b91c1c;
+  --danger-soft: rgba(220, 38, 38, 0.12);
+  --danger-soft-hover: rgba(220, 38, 38, 0.2);
+
+  --warning: #f59e0b;
+  --warning-dark: #b45309;
+
+  --info: #0369a1;
+  --info-soft: rgba(3, 105, 161, 0.12);
+  --info-soft-hover: rgba(3, 105, 161, 0.2);
+
+  --primary: #1d4ed8;
+  --primary-soft: rgba(29, 78, 216, 0.12);
+  --primary-soft-hover: rgba(29, 78, 216, 0.2);
+}
+
+.modo-oscuro {
+  --bg-app: #0b1220;
+  --bg-card: #1a2332;
+  --bg-soft: #131c2b;
+  --bg-input: #0f1728;
+  --bg-hover: #243044;
+  --border: #2f3d52;
+  --border-soft: #243044;
+  --text: #f1f5f9;
+  --text-soft: #e2e8f0;
+  --text-muted: #cbd5e1;
+  --text-faint: #94a3b8;
+  --text-placeholder: #64748b;
+  --shadow-sm: rgba(0, 0, 0, 0.5);
+  --shadow-md: rgba(0, 0, 0, 0.6);
+  --shadow-lg: rgba(0, 0, 0, 0.7);
+  --table-head: #131c2b;
+  --table-hover: #243044;
+  --overlay: rgba(0, 0, 0, 0.75);
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-soft: rgba(59, 130, 246, 0.22);
+  --accent-border: rgba(96, 165, 250, 0.5);
+  --accent-text: #93c5fd;
+
+  --success: #34d399;
+  --success-dark: #6ee7b7;
+  --success-soft: rgba(16, 185, 129, 0.25);
+  --success-soft-hover: rgba(16, 185, 129, 0.4);
+  --success-border: rgba(52, 211, 153, 0.55);
+
+  --danger: #f87171;
+  --danger-dark: #fca5a5;
+  --danger-soft: rgba(248, 113, 113, 0.22);
+  --danger-soft-hover: rgba(248, 113, 113, 0.38);
+
+  --warning: #fbbf24;
+  --warning-dark: #fcd34d;
+
+  --info: #7dd3fc;
+  --info-soft: rgba(56, 189, 248, 0.22);
+  --info-soft-hover: rgba(56, 189, 248, 0.38);
+
+  --primary: #93c5fd;
+  --primary-soft: rgba(96, 165, 250, 0.22);
+  --primary-soft-hover: rgba(96, 165, 250, 0.38);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-app);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.modo-oscuro .content h1,
+.modo-oscuro .content h2,
+.modo-oscuro .content h3,
+.modo-oscuro .content h4,
+.modo-oscuro .content h5,
+.modo-oscuro .content .nombre,
+.modo-oscuro .content .razon-social,
+.modo-oscuro .content .form-title,
+.modo-oscuro .content .form-card-header h2,
+.modo-oscuro .content .modal-header-text h2,
+.modo-oscuro .content .detail-header h2,
+.modo-oscuro .content .values-grid h3,
+.modo-oscuro .content .empty-state h3,
+.modo-oscuro .content .inicio h1,
+.modo-oscuro .content .stat-value,
+.modo-oscuro .content .chart-card h3,
+.modo-oscuro .content .alertas-section h3 {
+  color: var(--text);
+}
+
+.modo-oscuro .content p,
+.modo-oscuro .content .subtitle,
+.modo-oscuro .content .page-header p,
+.modo-oscuro .content .hint,
+.modo-oscuro .content .empty-state p,
+.modo-oscuro .content .inicio p,
+.modo-oscuro .content .modal-header-text p,
+.modo-oscuro .content .detail-header p,
+.modo-oscuro .content .stock-empty p,
+.modo-oscuro .content .stock-empty small,
+.modo-oscuro .content .descripcion,
+.modo-oscuro .content .nombre-comercial {
+  color: var(--text-muted);
+}
+
+.modo-oscuro .content .breadcrumbs {
+  color: var(--text-faint);
+}
+.modo-oscuro .content .breadcrumbs .actual {
+  color: var(--text);
+}
+.modo-oscuro .content .breadcrumbs .sep {
+  color: var(--text-placeholder);
+}
+
+.modo-oscuro .form-card,
+.modo-oscuro .table-card,
+.modo-oscuro .tabla-wrapper,
+.modo-oscuro .state-card,
+.modo-oscuro .stat-card,
+.modo-oscuro .chart-card,
+.modo-oscuro .alertas-section,
+.modo-oscuro .skeleton-wrapper,
+.modo-oscuro .toolbar,
+.modo-oscuro .detail-card,
+.modo-oscuro .warehouse-card {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.modo-oscuro .form-card-header,
+.modo-oscuro .modal-header,
+.modo-oscuro .modal-header-view,
+.modo-oscuro .modal-footer,
+.modo-oscuro .detail-grid div,
+.modo-oscuro .detail-header {
+  background: var(--bg-soft);
+  border-color: var(--border-soft);
+}
+
+.modo-oscuro .content input,
+.modo-oscuro .content select,
+.modo-oscuro .content textarea,
+.modo-oscuro .buscador-input,
+.modo-oscuro .select-input,
+.modo-oscuro .field input,
+.modo-oscuro .field select,
+.modo-oscuro .form-group input,
+.modo-oscuro .form-group select,
+.modo-oscuro .input-wrapper input,
+.modo-oscuro .stock-buscador input {
+  background: var(--bg-input);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.modo-oscuro .content input::placeholder,
+.modo-oscuro .buscador-input::placeholder,
+.modo-oscuro .field input::placeholder,
+.modo-oscuro .form-group input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.modo-oscuro .content label,
+.modo-oscuro .form-group label,
+.modo-oscuro .field label {
+  color: var(--text-soft);
+}
+
+.modo-oscuro .content .tabla thead,
+.modo-oscuro .stock-tabla thead,
+.modo-oscuro .detalle-tabla thead {
+  background: var(--table-head);
+}
+.modo-oscuro .content .tabla th,
+.modo-oscuro .stock-tabla th,
+.modo-oscuro .detalle-tabla th {
+  color: var(--text-faint);
+  border-color: var(--border);
+}
+.modo-oscuro .content .tabla td,
+.modo-oscuro .stock-tabla td,
+.modo-oscuro .detalle-tabla td {
+  color: var(--text);
+  border-color: var(--border-soft);
+}
+.modo-oscuro .content .tabla tbody tr:hover,
+.modo-oscuro .stock-tabla tbody tr:hover {
+  background: var(--table-hover);
+}
+.modo-oscuro .th-sort:hover {
+  color: var(--text);
+  background: var(--bg-input);
+}
+
+.modo-oscuro .modal,
+.modo-oscuro .modal-body,
+.modo-oscuro .modal-body-view,
+.modo-oscuro .detalle-tabla-wrapper {
+  background: var(--bg-card);
+  color: var(--text);
+}
+.modo-oscuro .modal-overlay {
+  background: var(--overlay);
+}
+
+.modo-oscuro .view-row {
+  border-color: var(--border-soft);
+}
+.modo-oscuro .view-label {
+  color: var(--text-faint);
+}
+.modo-oscuro .view-value {
+  color: var(--text);
+}
+
+.modo-oscuro .content .btn-secondary {
+  background: var(--bg-input);
+  color: var(--text-soft);
+  border-color: var(--border);
+}
+.modo-oscuro .content .btn-secondary:hover {
+  background: var(--bg-hover);
+}
+
+.modo-oscuro .content .btn-modal-cancelar {
+  background: var(--bg-input);
+  color: var(--text-soft);
+  border-color: var(--border);
+}
+.modo-oscuro .content .btn-modal-cancelar:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+.modo-oscuro .content .buscador-limpiar,
+.modo-oscuro .content .stock-buscador-limpiar,
+.modo-oscuro .content .btn-cerrar-form,
+.modo-oscuro .content .modal-cerrar-x {
+  background: var(--bg-input);
+  color: var(--text-faint);
+}
+.modo-oscuro .content .buscador-limpiar:hover,
+.modo-oscuro .content .stock-buscador-limpiar:hover,
+.modo-oscuro .content .btn-cerrar-form:hover,
+.modo-oscuro .content .modal-cerrar-x:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.modo-oscuro .content .id-badge,
+.modo-oscuro .content .codigo-badge,
+.modo-oscuro .content .numero-badge,
+.modo-oscuro .content .ruc-badge {
+  background: var(--bg-input);
+  color: var(--text-muted);
+}
+
+.modo-oscuro .content .razon-icono,
+.modo-oscuro .content .nombre-icono {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: #bfdbfe;
+}
+.modo-oscuro .content .razon-icono.inactiva,
+.modo-oscuro .content .nombre-icono.inactiva {
+  background: var(--bg-input);
+  color: var(--text-placeholder);
+}
+
+.modo-oscuro .content .empty-icon {
+  background: var(--bg-input);
+  color: var(--text-placeholder);
+}
+
+.modo-oscuro .content .skeleton-cell {
+  background: linear-gradient(90deg, var(--bg-soft) 25%, var(--bg-input) 50%, var(--bg-soft) 75%);
+  background-size: 200% 100%;
+}

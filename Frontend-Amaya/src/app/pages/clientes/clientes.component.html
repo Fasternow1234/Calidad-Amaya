@@ -1,0 +1,494 @@
+<div class="clientes">
+  @if (toast()) {
+    <div class="toast" [class.toast-success]="toast()!.tipo === 'success'" [class.toast-error]="toast()!.tipo === 'error'" role="alert">
+      <span class="toast-icon">
+        @if (toast()!.tipo === 'success') {
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        } @else {
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        }
+      </span>
+      <span class="toast-mensaje">{{ toast()!.mensaje }}</span>
+      @if (toast()!.accionLabel) {
+        <button type="button" class="toast-accion" (click)="ejecutarAccionToast()">{{ toast()!.accionLabel }}</button>
+      }
+      <button class="toast-cerrar" (click)="cerrarToast()" aria-label="Cerrar notificación">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  }
+
+  @if (clienteViendo()) {
+    <div class="modal-overlay" (click)="cerrarVista()" role="presentation">
+      <div class="modal modal-view" role="dialog" aria-modal="true" aria-labelledby="modal-cliente-titulo" tabindex="-1" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header-view">
+          <div class="modal-icon modal-icon-view">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="modal-header-text">
+            <h2 id="modal-cliente-titulo">Detalle del cliente</h2>
+            <p>Información completa del registro</p>
+          </div>
+          <button class="modal-cerrar-x" (click)="cerrarVista()" title="Cerrar" aria-label="Cerrar modal">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body modal-body-view">
+          <div class="view-row"><span class="view-label">ID</span><span class="view-value">{{ clienteViendo()!.id }}</span></div>
+          <div class="view-row">
+            <span class="view-label">Tipo</span>
+            <span class="view-value">
+              @if (clienteViendo()!.tipoDocumento === 'DNI') {
+                <span class="badge persona"><span class="badge-dot"></span>Persona</span>
+              } @else {
+                <span class="badge empresa"><span class="badge-dot"></span>Empresa</span>
+              }
+            </span>
+          </div>
+          <div class="view-row"><span class="view-label">{{ clienteViendo()!.tipoDocumento }}</span><span class="view-value"><span class="doc-badge">{{ clienteViendo()!.numeroDocumento }}</span></span></div>
+          @if (clienteViendo()!.tipoDocumento === 'DNI') {
+            <div class="view-row"><span class="view-label">Nombres</span><span class="view-value view-value-strong">{{ clienteViendo()!.nombres || '—' }}</span></div>
+            <div class="view-row"><span class="view-label">Apellido paterno</span><span class="view-value">{{ clienteViendo()!.apellidoPaterno || '—' }}</span></div>
+            <div class="view-row"><span class="view-label">Apellido materno</span><span class="view-value">{{ clienteViendo()!.apellidoMaterno || '—' }}</span></div>
+          } @else {
+            <div class="view-row"><span class="view-label">Razón social</span><span class="view-value view-value-strong">{{ clienteViendo()!.razonSocial || '—' }}</span></div>
+            <div class="view-row"><span class="view-label">Nombre comercial</span><span class="view-value">{{ clienteViendo()!.nombreComercial || '—' }}</span></div>
+          }
+          <div class="view-row"><span class="view-label">Dirección</span><span class="view-value">{{ clienteViendo()!.direccion || '—' }}</span></div>
+          <div class="view-row"><span class="view-label">Teléfono</span><span class="view-value">{{ clienteViendo()!.telefono || '—' }}</span></div>
+          <div class="view-row"><span class="view-label">Email</span><span class="view-value">{{ clienteViendo()!.email || '—' }}</span></div>
+          <div class="view-row">
+            <span class="view-label">Estado</span>
+            <span class="view-value">
+              @if (clienteViendo()!.estado === 1) {
+                <span class="badge activo"><span class="badge-dot"></span>Activo</span>
+              } @else {
+                <span class="badge inactivo"><span class="badge-dot"></span>Inactivo</span>
+              }
+            </span>
+          </div>
+          <div class="view-row"><span class="view-label">Fecha de registro</span><span class="view-value">{{ clienteViendo()!.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" (click)="cerrarVista()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (confirmacion()) {
+    <div class="modal-overlay" (click)="cancelarConfirmacion()" role="presentation">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-confirmar-titulo" tabindex="-1" (click)="$event.stopPropagation()">
+        <div class="modal-header" [class.modal-header-danger]="confirmacion()!.accion === 'eliminar'">
+          <div class="modal-icon">
+            @if (confirmacion()!.accion === 'eliminar') {
+              <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            } @else {
+              <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            }
+          </div>
+          <div class="modal-header-text">
+            <h2 id="modal-confirmar-titulo">{{ tituloConfirmacion() }}</h2>
+            <p>Esta acción requiere tu confirmación</p>
+          </div>
+        </div>
+        <div class="modal-body"><p>{{ mensajeConfirmacion() }}</p></div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" (click)="cancelarConfirmacion()" [disabled]="procesando()">Cancelar</button>
+          <button type="button" class="btn-modal-confirmar" [class.btn-danger]="confirmacion()!.accion === 'eliminar'" [class.btn-success]="confirmacion()!.accion === 'reactivar'" (click)="confirmarAccion()" [disabled]="procesando()">
+            {{ procesando() ? 'Procesando...' : (confirmacion()!.accion === 'eliminar' ? 'Sí, eliminar' : 'Sí, reactivar') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <nav class="breadcrumbs" aria-label="Ruta de navegación">
+    <span>Inicio</span>
+    <span class="sep">/</span>
+    <span class="actual">Clientes</span>
+  </nav>
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-icon">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Clientes</h1>
+        <p>Personas y empresas que compran tu mercadería</p>
+      </div>
+    </div>
+    <button class="btn-primary" (click)="abrirFormularioNuevo()" [disabled]="guardando()">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuevo cliente
+    </button>
+  </div>
+
+  @if (formVisible()) {
+    <div class="form-card">
+      <div class="form-card-header">
+        <h2>{{ tituloFormulario() }}</h2>
+        <button type="button" class="btn-cerrar-form" (click)="cancelarFormulario()" aria-label="Cerrar formulario">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="form-body">
+
+        <div class="form-group form-group--wide">
+          <label>Tipo de cliente <span class="requerido">*</span></label>
+          <div class="segmento-tipo" role="group" aria-label="Tipo de cliente">
+            <button
+              type="button"
+              class="segmento-btn"
+              [class.activo]="tipoFormulario() === 'DNI'"
+              (click)="cambiarTipoFormulario('DNI')"
+              [attr.aria-pressed]="tipoFormulario() === 'DNI'"
+            >
+              <strong>Persona natural</strong>
+              <small>DNI</small>
+            </button>
+            <button
+              type="button"
+              class="segmento-btn"
+              [class.activo]="tipoFormulario() === 'RUC'"
+              (click)="cambiarTipoFormulario('RUC')"
+              [attr.aria-pressed]="tipoFormulario() === 'RUC'"
+            >
+              <strong>Empresa / Negocio</strong>
+              <small>RUC</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- Persona natural -->
+        @if (tipoFormulario() === 'DNI') {
+          <div class="form-group form-group--wide">
+            <label for="numeroDocumento">DNI <span class="requerido">*</span></label>
+            <div class="input-con-boton">
+              <div class="input-wrapper">
+                <input
+                  id="numeroDocumento"
+                  type="text"
+                  formControlName="numeroDocumento"
+                  placeholder="Ej: 45678912"
+                  maxlength="8"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  autofocus
+                  (input)="onNumeroDocumentoInput($event)"
+                />
+              </div>
+              <button type="button" class="btn-buscar-doc" (click)="consultarDni()" [disabled]="buscandoDni()" aria-label="Consultar DNI en RENIEC">
+                @if (buscandoDni()) {
+                  <span class="spinner-btn" aria-hidden="true"></span>
+                  <span>Consultando...</span>
+                } @else {
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <span>Consultar RENIEC</span>
+                }
+              </button>
+            </div>
+            @if (numeroDocumento.touched && numeroDocumento.invalid) {
+              <small class="error" role="alert">
+                @if (numeroDocumento.errors?.['required']) { El DNI es obligatorio }
+                @if (numeroDocumento.errors?.['dniInvalido']) { {{ numeroDocumento.errors?.['dniInvalido'] }} }
+              </small>
+            }
+            @if (dniError()) {
+              <small class="error" role="alert">{{ dniError() }}</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="nombres">Nombres <span class="requerido">*</span></label>
+            <input id="nombres" type="text" formControlName="nombres" placeholder="Nombres completos" autocomplete="off" />
+            @if (nombres.touched && nombres.invalid) {
+              <small class="error" role="alert">
+                @if (nombres.errors?.['required']) { Los nombres son obligatorios }
+                @if (nombres.errors?.['maxlength']) { Máximo 100 caracteres }
+              </small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="apellidoPaterno">Apellido paterno <span class="requerido">*</span></label>
+            <input id="apellidoPaterno" type="text" formControlName="apellidoPaterno" placeholder="Apellido paterno" autocomplete="off" />
+            @if (apellidoPaterno.touched && apellidoPaterno.invalid) {
+              <small class="error" role="alert">El apellido paterno es obligatorio</small>
+            }
+          </div>
+
+          <div class="form-group form-group--wide">
+            <label for="apellidoMaterno">Apellido materno <span class="requerido">*</span></label>
+            <input id="apellidoMaterno" type="text" formControlName="apellidoMaterno" placeholder="Apellido materno" autocomplete="off" />
+            @if (apellidoMaterno.touched && apellidoMaterno.invalid) {
+              <small class="error" role="alert">El apellido materno es obligatorio</small>
+            }
+          </div>
+        }
+
+        <!-- Empresa -->
+        @if (tipoFormulario() === 'RUC') {
+          <div class="form-group form-group--wide">
+            <label for="numeroDocumento">RUC <span class="requerido">*</span></label>
+            <div class="input-con-boton">
+              <div class="input-wrapper">
+                <input
+                  id="numeroDocumento"
+                  type="text"
+                  formControlName="numeroDocumento"
+                  placeholder="Ej: 20554382933"
+                  maxlength="11"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  autofocus
+                  (input)="onNumeroDocumentoInput($event)"
+                />
+              </div>
+              <button type="button" class="btn-buscar-doc" (click)="consultarRuc()" [disabled]="buscandoRuc()" aria-label="Consultar RUC en SUNAT">
+                @if (buscandoRuc()) {
+                  <span class="spinner-btn" aria-hidden="true"></span>
+                  <span>Consultando...</span>
+                } @else {
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <span>Consultar SUNAT</span>
+                }
+              </button>
+            </div>
+            @if (numeroDocumento.touched && numeroDocumento.invalid) {
+              <small class="error" role="alert">
+                @if (numeroDocumento.errors?.['required']) { El RUC es obligatorio }
+                @if (numeroDocumento.errors?.['rucInvalido']) { {{ numeroDocumento.errors?.['rucInvalido'] }} }
+              </small>
+            }
+            @if (rucError()) {
+              <small class="error" role="alert">{{ rucError() }}</small>
+            }
+            <small class="hint">El RUC debe empezar con 10 o 20.</small>
+          </div>
+
+          <div class="form-group form-group--wide">
+            <label for="razonSocial">Razón social <span class="requerido">*</span></label>
+            <input id="razonSocial" type="text" formControlName="razonSocial" placeholder="Nombre legal de la empresa" autocomplete="off" />
+            @if (razonSocial.touched && razonSocial.invalid) {
+              <small class="error" role="alert">La razón social es obligatoria</small>
+            }
+          </div>
+
+          <div class="form-group form-group--wide">
+            <label for="nombreComercial">Nombre comercial <span class="opcional">(opcional)</span></label>
+            <input id="nombreComercial" type="text" formControlName="nombreComercial" placeholder="Nombre con el que se conoce" autocomplete="off" />
+          </div>
+        }
+
+        <!-- Comunes -->
+        <div class="form-group form-group--wide">
+          <label for="direccion">Dirección <span class="opcional">(opcional)</span></label>
+          <input id="direccion" type="text" formControlName="direccion" placeholder="Dirección fiscal o de contacto" autocomplete="off" />
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono <span class="opcional">(opcional)</span></label>
+          <input id="telefono" type="text" formControlName="telefono" placeholder="Ej: 987654321" inputmode="numeric" autocomplete="off" (input)="onTelefonoInput($event)" />
+          @if (telefono.touched && telefono.invalid) {
+            <small class="error" role="alert">{{ telefono.errors?.['telefonoInvalido'] }}</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email <span class="opcional">(opcional)</span></label>
+          <input id="email" type="email" formControlName="email" placeholder="contacto@cliente.com" autocomplete="off" />
+          @if (email.touched && email.invalid) {
+            <small class="error" role="alert">
+              @if (email.errors?.['email']) { Formato de email inválido }
+              @if (email.errors?.['maxlength']) { Máximo 150 caracteres }
+            </small>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="cancelarFormulario()">Cancelar</button>
+          <button type="submit" class="btn-primary-sm" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="toolbar">
+    <div class="buscador">
+      <svg class="buscador-icono" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="buscador-input" placeholder="Buscar por documento, nombre, razón social o email..." [value]="busqueda()" (input)="onBuscar($event)" />
+      @if (busqueda()) {
+        <button class="buscador-limpiar" (click)="limpiarBusqueda()" title="Limpiar" aria-label="Limpiar búsqueda">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      }
+    </div>
+    <label class="switch-inactivas">
+      <input type="checkbox" [checked]="mostrarInactivos()" (change)="toggleInactivos()" />
+      <span class="switch-track"><span class="switch-thumb"></span></span>
+      <span class="switch-label">Mostrar inactivos</span>
+    </label>
+  </div>
+
+  <div class="filtros-rapidos" role="group" aria-label="Filtrar por tipo de cliente">
+    <button type="button" class="chip" [class.activo]="filtroTipo() === 'TODOS'" (click)="cambiarFiltro('TODOS')">
+      Todos <span class="chip-count">{{ conteos().todos }}</span>
+    </button>
+    <button type="button" class="chip" [class.activo]="filtroTipo() === 'PERSONA'" (click)="cambiarFiltro('PERSONA')">
+      Personas <span class="chip-count">{{ conteos().personas }}</span>
+    </button>
+    <button type="button" class="chip" [class.activo]="filtroTipo() === 'EMPRESA'" (click)="cambiarFiltro('EMPRESA')">
+      Empresas <span class="chip-count">{{ conteos().empresas }}</span>
+    </button>
+  </div>
+
+  @if (cargando()) {
+    <div class="skeleton-wrapper">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="skeleton-row">
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell wide"></div>
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell small"></div>
+          <div class="skeleton-cell small"></div>
+        </div>
+      }
+    </div>
+  } @else {
+    @if (clientes().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3>Aún no tienes clientes registrados</h3>
+        <p>Los clientes son las personas y empresas que te compran.</p>
+        <p class="empty-detalle">Registra el primero para poder emitirle comprobantes de venta.</p>
+        <button class="btn-primary-sm" (click)="abrirFormularioNuevo()">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Crear mi primer cliente
+        </button>
+      </div>
+    } @else if (clientesFiltrados().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Sin resultados</h3>
+        <p>No hay clientes que coincidan con los filtros aplicados.</p>
+        <button class="btn-secondary" (click)="limpiarBusqueda(); cambiarFiltro('TODOS')">Limpiar filtros</button>
+      </div>
+    } @else {
+      <div class="tabla-wrapper">
+        <table class="tabla">
+          <caption class="sr-only">Listado de clientes registrados</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="col-doc th-sort" (click)="ordenarPor('documento')">
+                Documento <span class="sort-icon">{{ iconoOrden('documento') }}</span>
+              </th>
+              <th scope="col" class="th-sort" (click)="ordenarPor('nombre')">
+                Cliente <span class="sort-icon">{{ iconoOrden('nombre') }}</span>
+              </th>
+              <th scope="col" class="col-tipo">Tipo</th>
+              <th scope="col" class="col-contacto">Contacto</th>
+              <th scope="col" class="col-estado">Estado</th>
+              <th scope="col" class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of clientesFiltrados(); track c.id) {
+              <tr [class.inactiva]="c.estado === 0">
+                <td class="col-doc">
+                  <span class="doc-badge">{{ c.numeroDocumento }}</span>
+                  <small class="doc-tipo">{{ c.tipoDocumento }}</small>
+                </td>
+                <td>
+                  <div class="cliente-cell">
+                    <div class="cliente-icono" [class.empresa]="c.tipoDocumento === 'RUC'" [class.inactiva]="c.estado === 0">
+                      {{ c.nombreMostrar.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="cliente-texto">
+                      <span class="cliente-nombre">{{ c.nombreMostrar }}</span>
+                      @if (c.nombreComercial) {
+                        <small class="cliente-sub">{{ c.nombreComercial }}</small>
+                      }
+                    </div>
+                  </div>
+                </td>
+                <td class="col-tipo">
+                  @if (c.tipoDocumento === 'DNI') {
+                    <span class="badge persona"><span class="badge-dot"></span>Persona</span>
+                  } @else {
+                    <span class="badge empresa"><span class="badge-dot"></span>Empresa</span>
+                  }
+                </td>
+                <td class="col-contacto">
+                  @if (c.telefono) {
+                    <div class="contacto-linea">
+                      <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                      {{ c.telefono }}
+                    </div>
+                  }
+                  @if (c.email) {
+                    <div class="contacto-linea">
+                      <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                      {{ c.email }}
+                    </div>
+                  }
+                  @if (!c.telefono && !c.email) {
+                    <span class="sin-contacto">—</span>
+                  }
+                </td>
+                <td class="col-estado">
+                  @if (c.estado === 1) {
+                    <span class="badge activo"><span class="badge-dot"></span>Activo</span>
+                  } @else {
+                    <span class="badge inactivo"><span class="badge-dot"></span>Inactivo</span>
+                  }
+                </td>
+                <td class="col-acciones">
+                  <button class="btn-accion ver" (click)="verCliente(c)" title="Ver detalle" aria-label="Ver detalle del cliente">
+                    <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                  @if (c.estado === 1) {
+                    <button class="btn-accion editar" (click)="abrirFormularioEditar(c)" title="Editar" aria-label="Editar cliente">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn-accion eliminar" (click)="pedirEliminar(c)" title="Eliminar" aria-label="Eliminar cliente">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  } @else {
+                    <button class="btn-accion reactivar" (click)="pedirReactivar(c)" title="Reactivar" aria-label="Reactivar cliente">
+                      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

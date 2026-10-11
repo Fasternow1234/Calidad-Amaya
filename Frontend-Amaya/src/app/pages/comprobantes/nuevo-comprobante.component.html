@@ -1,0 +1,154 @@
+<div class="form-card">
+  <div class="form-card-header">
+    <h2>Nuevo comprobante</h2>
+    <button type="button" class="btn-cerrar-form" (click)="cancelar()" aria-label="Cerrar formulario">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="tipo">Tipo de operación <span class="requerido">*</span></label>
+        <select id="tipo" formControlName="tipo" class="select-input">
+          <option value="COMPRA">Compra (ingresa mercadería)</option>
+          <option value="VENTA">Venta (sale mercadería)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaEmision">Fecha de emisión <span class="requerido">*</span></label>
+        <input id="fechaEmision" type="date" formControlName="fechaEmision" [max]="maxFecha" />
+        @if (fechaEmision.touched && fechaEmision.invalid) {
+          <small class="error" role="alert">La fecha es obligatoria</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Tipo de comprobante <span class="requerido">*</span></label>
+        <div class="segmento-tipo" role="group" aria-label="Tipo de comprobante SUNAT">
+          <button
+            type="button"
+            class="segmento-btn"
+            [class.activo]="tipoComprobante() === 'F'"
+            (click)="cambiarTipoComprobante('F')"
+            [attr.aria-pressed]="tipoComprobante() === 'F'"
+          >
+            <strong>Factura</strong>
+            <small>F001</small>
+          </button>
+          <button
+            type="button"
+            class="segmento-btn"
+            [class.activo]="tipoComprobante() === 'B'"
+            (click)="cambiarTipoComprobante('B')"
+            [attr.aria-pressed]="tipoComprobante() === 'B'"
+          >
+            <strong>Boleta</strong>
+            <small>B001</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="correlativo">Correlativo <span class="requerido">*</span></label>
+        <input
+          id="correlativo"
+          type="text"
+          inputmode="numeric"
+          maxlength="8"
+          [value]="correlativo()"
+          (input)="onCorrelativoInput($event)"
+          autocomplete="off"
+        />
+        <small class="preview-numero">
+          Número completo: <strong>{{ numeroPreview() }}</strong>
+        </small>
+      </div>
+
+      @if (tipo.value === 'COMPRA') {
+        <div class="form-group wide">
+          <label for="idProveedor">Proveedor <span class="requerido">*</span></label>
+          <select id="idProveedor" formControlName="idProveedor" class="select-input">
+            <option [ngValue]="0">— Selecciona un proveedor —</option>
+            @for (p of proveedores(); track p.id) {
+              <option [ngValue]="p.id">{{ p.razonSocial }} — {{ p.ruc }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="form-group wide">
+        <div class="form-label-row">
+          <label for="observacion">Observación <span class="opcional">(opcional)</span></label>
+          <span class="contador" [class.limite]="observacionLargo() >= 280">{{ observacionLargo() }}/300</span>
+        </div>
+        <input id="observacion" type="text" formControlName="observacion" placeholder="Notas o referencia interna" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="seccion-detalle">
+      <div class="seccion-titulo">
+        <h3>Productos</h3>
+        <button type="button" class="btn-primary-sm" (click)="agregarDetalle()">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Agregar línea
+        </button>
+      </div>
+
+      <div formArrayName="detalles">
+        @for (linea of lineas(); track $index; let i = $index) {
+          <div class="linea-detalle" [formGroupName]="i">
+            <div class="form-group">
+              <label>Producto</label>
+              <select formControlName="idProducto" class="select-input" (change)="onProductoChange(i)">
+                <option [ngValue]="0">— Selecciona —</option>
+                @for (p of productosDisponibles(); track p.id) {
+                  <option [ngValue]="p.id">{{ p.nombre }} (Stock: {{ p.stockTotal }} {{ p.unidadMedida }})</option>
+                }
+              </select>
+              @if (productoDeLinea(i)) {
+                <small class="stock-info">
+                  Disponible: {{ productoDeLinea(i)!.stockTotal }} {{ productoDeLinea(i)!.unidadMedida?.toLowerCase() }}
+                  · Almacén: {{ productoDeLinea(i)!.nombreAlmacenDefault || 'Sin almacén' }}
+                </small>
+              }
+            </div>
+            <div class="form-group">
+              <label>Cantidad</label>
+              <input type="number" min="0.01" step="0.01" formControlName="cantidad" />
+              @if (stockInsuficiente(i)) {
+                <small class="error" role="alert">Excede el stock disponible</small>
+              }
+            </div>
+            <div class="form-group">
+              <label>Precio unit.</label>
+              <input type="number" min="0" step="0.01" formControlName="precioUnitario" />
+            </div>
+            <button type="button" class="btn-quitar-linea" (click)="eliminarDetalle(i)" [disabled]="detalles.length === 1" title="Quitar línea" aria-label="Quitar línea">
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="total-linea">
+        <span>Total:</span>
+        <strong>S/ {{ total() | number:'1.2-2' }}</strong>
+      </div>
+    </div>
+
+    @if (errorMsg()) {
+      <div class="alert-error" role="alert">{{ errorMsg() }}</div>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="cancelar()" [disabled]="guardando()">Cancelar</button>
+      <button type="submit" class="btn-primary-sm" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : 'Registrar comprobante' }}
+      </button>
+    </div>
+  </form>
+</div>
