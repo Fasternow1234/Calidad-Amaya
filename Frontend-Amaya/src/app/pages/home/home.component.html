@@ -69,10 +69,7 @@
     </aside>
     <main class="content">
       @if (seccionActiva() === 'inicio') {
-        <div class="inicio">
-          <h1>¡Bienvenido, {{ usuario()?.nombreEmpleado }}!</h1>
-          <p>Selecciona una opción del menú para comenzar.</p>
-        </div>
+        <app-dashboard />
       }
       @if (seccionActiva() === 'proveedores') {
         <app-proveedores />
@@ -94,6 +91,12 @@
       }
       @if (seccionActiva() === 'clientes') {
         <app-clientes />
+      }
+      @if (seccionActiva() === 'usuarios') {
+        <app-usuarios />
+      }
+      @if (seccionActiva() === 'kardex') {
+        <app-kardex />
       }
     </main>
   </div>

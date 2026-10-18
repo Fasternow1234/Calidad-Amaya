@@ -7,6 +7,9 @@ import { AlmacenesComponent } from '../almacenes/almacenes.component';
 import { MovimientosComponent } from '../movimientos/movimientos.component';
 import { ComprobantesComponent } from '../comprobantes/comprobantes.component';
 import { ClientesComponent } from '../clientes/clientes.component';
+import { UsuariosComponent } from '../usuarios/usuarios.component';
+import { KardexComponent } from '../kardex/kardex.component';
+import { DashboardComponent } from './dashboard.component';
 
 interface MenuItem {
   codigo: string;
@@ -24,7 +27,9 @@ const MAPA_OPCIONES: Record<string, { ruta: string; icono: string }> = {
   almacenes:    { ruta: 'almacenes',    icono: '🏭' },
   movimientos:  { ruta: 'movimientos',  icono: '🔁' },
   comprobantes: { ruta: 'comprobantes', icono: '🧾' },
-  clientes:     { ruta: 'clientes',     icono: '👥' }
+  clientes:     { ruta: 'clientes',     icono: '👥' },
+  usuarios:     { ruta: 'usuarios',     icono: '👤' },
+  kardex:        { ruta: 'kardex',        icono: '📊' }
 };
 
 @Component({
@@ -37,7 +42,10 @@ const MAPA_OPCIONES: Record<string, { ruta: string; icono: string }> = {
     AlmacenesComponent,
     MovimientosComponent,
     ComprobantesComponent,
-    ClientesComponent
+    ClientesComponent,
+    UsuariosComponent,
+    KardexComponent,
+    DashboardComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'

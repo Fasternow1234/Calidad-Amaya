@@ -35,6 +35,10 @@ public class Comprobante {
     @JoinColumn(name = "id_proveedor")
     private Proveedor proveedor;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_cliente")
+    private Cliente cliente;
+
     @Column(length = 300)
     private String observacion;
 

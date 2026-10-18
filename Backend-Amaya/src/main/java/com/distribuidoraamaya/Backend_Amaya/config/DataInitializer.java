@@ -36,6 +36,8 @@ public class DataInitializer implements CommandLineRunner {
         Opcion movimientos  = crearOpcionSiNoExiste("movimientos",  "Movimientos",  6);
         Opcion comprobantes = crearOpcionSiNoExiste("comprobantes", "Comprobantes", 7);
         Opcion clientes     = crearOpcionSiNoExiste("clientes",     "Clientes",     8);
+        Opcion usuarios     = crearOpcionSiNoExiste("usuarios",     "Usuarios",     9);
+        Opcion kardex       = crearOpcionSiNoExiste("kardex",       "Kardex",      10);
 
         Rol rolAdmin = rolRepository.findByNombre("ADMINISTRADOR")
                 .orElseGet(() -> rolRepository.save(
@@ -45,14 +47,14 @@ public class DataInitializer implements CommandLineRunner {
                                 .build()
                 ));
 
-        crearRolOpcionSiNoExiste(rolAdmin.getId(), inicio.getId());
-        crearRolOpcionSiNoExiste(rolAdmin.getId(), proveedores.getId());
-        crearRolOpcionSiNoExiste(rolAdmin.getId(), categorias.getId());
-        crearRolOpcionSiNoExiste(rolAdmin.getId(), productos.getId());
-        crearRolOpcionSiNoExiste(rolAdmin.getId(), almacenes.getId());
-        crearRolOpcionSiNoExiste(rolAdmin.getId(), movimientos.getId());
-        crearRolOpcionSiNoExiste(rolAdmin.getId(), comprobantes.getId());
-        crearRolOpcionSiNoExiste(rolAdmin.getId(), clientes.getId());
+        asignarOpciones(rolAdmin, inicio, proveedores, categorias, productos, almacenes,
+                movimientos, comprobantes, clientes, usuarios, kardex);
+
+        Rol rolAlmacenero = crearRolSiNoExiste("ALMACENERO", "Gestión de almacenes e inventario");
+        asignarOpciones(rolAlmacenero, inicio, proveedores, categorias, productos, almacenes, movimientos, kardex);
+
+        Rol rolVendedor = crearRolSiNoExiste("VENDEDOR", "Gestión de clientes y ventas");
+        asignarOpciones(rolVendedor, inicio, productos, comprobantes, clientes);
 
         if (!usuarioRepository.existsByNombreUsuario("admin")) {
             usuarioRepository.save(
@@ -81,6 +83,20 @@ public class DataInitializer implements CommandLineRunner {
                                 .estado(1)
                                 .build()
                 ));
+    }
+
+    private Rol crearRolSiNoExiste(String nombre, String descripcion) {
+        return rolRepository.findByNombre(nombre)
+                .orElseGet(() -> rolRepository.save(Rol.builder()
+                        .nombre(nombre)
+                        .descripcion(descripcion)
+                        .build()));
+    }
+
+    private void asignarOpciones(Rol rol, Opcion... opciones) {
+        for (Opcion opcion : opciones) {
+            crearRolOpcionSiNoExiste(rol.getId(), opcion.getId());
+        }
     }
 
     private void crearRolOpcionSiNoExiste(Long idRol, Long idOpcion) {

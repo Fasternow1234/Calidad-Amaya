@@ -1,0 +1,59 @@
+<section class="dashboard">
+  <div class="dash-heading">
+    <div><p class="eyebrow">PANEL DE CONTROL</p><h1>&iexcl;Bienvenido, {{ usuario()?.nombreEmpleado }}!</h1><p>Resumen de actividad y estado del inventario.</p></div>
+    <span class="today">{{ fechaActual }}</span>
+  </div>
+  <div class="metric-grid">
+    <article class="metric-card"><span class="metric-icon blue">P</span><div><p>Productos activos</p><strong>{{ cargandoProductos() ? '...' : productos().length }}</strong><small>En el cat&aacute;logo</small></div></article>
+    <article class="metric-card"><span class="metric-icon red">!</span><div><p>Sin stock</p><strong>{{ cargandoProductos() ? '...' : agotados().length }}</strong><small>Requieren reposici&oacute;n</small></div></article>
+    <article class="metric-card"><span class="metric-icon amber">+</span><div><p>Stock bajo</p><strong>{{ cargandoProductos() ? '...' : stockBajo().length }}</strong><small>Hasta {{ umbralStockBajo }} unidades</small></div></article>
+    @if (esComercial()) {
+      <article class="metric-card"><span class="metric-icon green">S/</span><div><p>Ventas de hoy</p><strong>{{ cargandoComprobantes() ? '...' : moneda(totalVentasHoy()) }}</strong><small>{{ ventasHoy().length }} comprobantes activos</small></div></article>
+    } @else {
+      <article class="metric-card"><span class="metric-icon green">M</span><div><p>Movimientos de hoy</p><strong>{{ cargandoMovimientos() ? '...' : movimientosHoy().length }}</strong><small>{{ entradasHoy() }} entradas / {{ salidasHoy() }} salidas</small></div></article>
+    }
+  </div>
+  @if (errorProductos()) { <p class="inline-error">No se pudo cargar el cat&aacute;logo. Actualiza la p&aacute;gina para reintentar.</p> }
+  @if (esComercial() && errorComprobantes()) { <p class="inline-error">No se pudieron cargar las ventas.</p> }
+  @if (esInventario() && errorMovimientos()) { <p class="inline-error">No se pudieron cargar los movimientos.</p> }
+  <div class="dash-grid">
+    <article class="panel chart-panel">
+      <div class="panel-heading"><div><h2>{{ esComercial() ? 'Ventas de los &uacute;ltimos 7 d&iacute;as' : 'Movimientos de los &uacute;ltimos 7 d&iacute;as' }}</h2><p>{{ esComercial() ? 'Importe de comprobantes activos' : 'Cantidad de operaciones registradas' }}</p></div><span class="panel-icon">#</span></div>
+      <div class="chart" role="img" [attr.aria-label]="esComercial() ? 'Gr&aacute;fico de ventas de los &uacute;ltimos siete d&iacute;as' : 'Gr&aacute;fico de movimientos de los &uacute;ltimos siete d&iacute;as'">
+        @for (dia of (esComercial() ? graficoVentas() : graficoMovimientos()); track dia.etiqueta) {
+          <div class="chart-column"><span class="bar-value">{{ esComercial() ? (dia.valor | number:'1.0-0') : dia.valor }}</span><div class="bar-track"><div class="bar" [style.height.%]="dia.alto"></div></div><span class="bar-label">{{ dia.etiqueta }}</span></div>
+        }
+      </div>
+      <div class="chart-footnote">{{ esComercial() ? 'Importes en soles (S/).' : 'Se cuentan operaciones, no unidades, porque el inventario combina distintas medidas.' }}</div>
+    </article>
+    <article class="panel alerts-panel">
+      <div class="panel-heading"><div><h2>Alertas de inventario</h2><p>Productos que conviene revisar</p></div><span class="panel-icon warning">!</span></div>
+      @if (cargandoProductos()) { <p class="empty-state">Cargando inventario...</p> }
+      @else if (agotados().length + stockBajo().length === 0) { <p class="empty-state">No hay alertas de stock con el umbral actual.</p> }
+      @else {
+        <div class="alert-list">
+          @for (p of agotados().slice(0, 4); track p.id) { <div class="alert-row"><span class="status-dot out"></span><div class="alert-name"><strong>{{ p.nombre }}</strong><small>{{ p.codigo }} / Sin existencias</small></div><b class="stock-out">0 {{ p.unidadMedida | lowercase }}</b></div> }
+          @for (p of stockBajo().slice(0, 4); track p.id) { <div class="alert-row"><span class="status-dot low"></span><div class="alert-name"><strong>{{ p.nombre }}</strong><small>{{ p.codigo }} / Stock bajo</small></div><b>{{ p.stockTotal }} {{ p.unidadMedida | lowercase }}</b></div> }
+        </div>
+        <small class="threshold-note">Aviso bajo: 1 a {{ umbralStockBajo }} unidades por producto.</small>
+      }
+    </article>
+  </div>
+  <div class="dash-grid lower-grid">
+    @if (esComercial()) {
+      <article class="panel"><div class="panel-heading"><div><h2>Resumen de ventas</h2><p>Comprobantes de venta no anulados</p></div></div><div class="sales-summary"><div><small>Este mes</small><strong>{{ cargandoComprobantes() ? '...' : moneda(totalVentasMes()) }}</strong></div><div><small>Ventas este mes</small><strong>{{ cargandoComprobantes() ? '...' : ventasMes().length }}</strong></div></div></article>
+      <article class="panel"><div class="panel-heading"><div><h2>Ventas recientes</h2><p>&Uacute;ltimos comprobantes registrados</p></div></div>
+        @if (cargandoComprobantes()) { <p class="empty-state">Cargando ventas...</p> }
+        @else if (ventasRecientes().length === 0) { <p class="empty-state">Todav&iacute;a no hay ventas registradas.</p> }
+        @else { <div class="recent-list">@for (c of ventasRecientes(); track c.id) { <div class="recent-row"><span class="recent-mark sale">V</span><div class="recent-main"><strong>{{ c.numero }}</strong><small>{{ c.nombreCliente || 'Venta sin cliente' }} / {{ formatearFecha(c.fechaEmision) }}</small></div><b>{{ moneda(c.total) }}</b></div> }</div> }
+      </article>
+    } @else {
+      <article class="panel"><div class="panel-heading"><div><h2>Estado del cat&aacute;logo</h2><p>Disponibilidad de productos activos</p></div></div><div class="stock-summary"><div class="stock-summary-item"><span class="status-dot available"></span><span>Con existencias</span><strong>{{ productos().length - agotados().length }}</strong></div><div class="stock-summary-item"><span class="status-dot out"></span><span>Agotados</span><strong>{{ agotados().length }}</strong></div><div class="stock-summary-item"><span class="status-dot low"></span><span>Stock bajo</span><strong>{{ stockBajo().length }}</strong></div></div></article>
+      <article class="panel"><div class="panel-heading"><div><h2>Actividad reciente</h2><p>&Uacute;ltimos movimientos de almac&eacute;n</p></div></div>
+        @if (cargandoMovimientos()) { <p class="empty-state">Cargando movimientos...</p> }
+        @else if (movimientosRecientes().length === 0) { <p class="empty-state">Todav&iacute;a no hay movimientos registrados.</p> }
+        @else { <div class="recent-list">@for (m of movimientosRecientes(); track m.id) { <div class="recent-row"><span class="recent-mark" [class.sale]="m.tipo === 'SALIDA'">{{ m.tipo === 'ENTRADA' ? '+' : '-' }}</span><div class="recent-main"><strong>{{ m.nombreProducto }}</strong><small>{{ m.tipo }} / {{ m.nombreAlmacen }} / {{ formatearFecha(m.fecha) }}</small></div><b>{{ m.cantidad }} {{ m.unidadMedida | lowercase }}</b></div> }</div> }
+      </article>
+    }
+  </div>
+</section>

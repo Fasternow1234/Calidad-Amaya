@@ -24,6 +24,7 @@ public class ComprobanteService {
     private final ProductoRepository productoRepository;
     private final AlmacenRepository almacenRepository;
     private final ProveedorRepository proveedorRepository;
+    private final ClienteRepository clienteRepository;
     private final UsuarioRepository usuarioRepository;
     private final StockRepository stockRepository;
     private final MovimientoService movimientoService;
@@ -54,6 +55,7 @@ public class ComprobanteService {
         }
 
         Proveedor proveedor = null;
+        Cliente cliente = null;
         if (tipo == TipoComprobante.COMPRA) {
             if (request.getIdProveedor() == null) {
                 throw new IllegalArgumentException("Debe seleccionar un proveedor para la compra");
@@ -63,6 +65,15 @@ public class ComprobanteService {
             if (proveedor.getEstado() == null || proveedor.getEstado() != 1) {
                 throw new IllegalArgumentException("El proveedor seleccionado está inactivo");
             }
+        } else {
+            if (request.getIdCliente() == null) {
+                throw new IllegalArgumentException("Debe seleccionar un cliente para la venta");
+            }
+            cliente = clienteRepository.findById(request.getIdCliente())
+                    .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
+            if (cliente.getEstado() == null || cliente.getEstado() != 1) {
+                throw new IllegalArgumentException("El cliente seleccionado está inactivo");
+            }
         }
 
         // ✅ Se construye el comprobante SIN guardarlo aún
@@ -71,6 +82,7 @@ public class ComprobanteService {
                 .numero(request.getNumero().trim())
                 .fechaEmision(request.getFechaEmision())
                 .proveedor(proveedor)
+                .cliente(cliente)
                 .observacion(limpiar(request.getObservacion()))
                 .total(BigDecimal.ZERO)
                 .estado(1)
@@ -186,6 +198,9 @@ public class ComprobanteService {
                 .idProveedor(c.getProveedor() != null ? c.getProveedor().getId() : null)
                 .razonSocialProveedor(c.getProveedor() != null ? c.getProveedor().getRazonSocial() : null)
                 .rucProveedor(c.getProveedor() != null ? c.getProveedor().getRuc() : null)
+                .idCliente(c.getCliente() != null ? c.getCliente().getId() : null)
+                .nombreCliente(c.getCliente() != null ? construirNombreCliente(c.getCliente()) : null)
+                .documentoCliente(c.getCliente() != null ? c.getCliente().getNumeroDocumento() : null)
                 .observacion(c.getObservacion())
                 .total(c.getTotal())
                 .estado(c.getEstado())
@@ -213,5 +228,14 @@ public class ComprobanteService {
         ComprobanteResponse r = toResponseSinDetalle(c);
         r.setDetalles(detalles);
         return r;
+    }
+
+    private String construirNombreCliente(Cliente cliente) {
+        if ("RUC".equals(cliente.getTipoDocumento()) && cliente.getRazonSocial() != null) {
+            return cliente.getRazonSocial();
+        }
+        return java.util.stream.Stream.of(cliente.getNombres(), cliente.getApellidoPaterno(), cliente.getApellidoMaterno())
+                .filter(valor -> valor != null && !valor.isBlank())
+                .collect(java.util.stream.Collectors.joining(" "));
     }
 }

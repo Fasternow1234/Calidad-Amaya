@@ -10,12 +10,14 @@ import com.distribuidoraamaya.Backend_Amaya.service.RucService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/clientes")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VENDEDOR')")
 @RequiredArgsConstructor
 public class ClienteController {
 

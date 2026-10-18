@@ -746,6 +746,9 @@
   font-weight: 600;
   white-space: nowrap;
 }
+.btn-imprimir { margin-right: auto; }
+.btn-pdf { background: var(--accent); }
+
 @media (max-width: 1100px) {
   .col-usuario { display: none; }
 }

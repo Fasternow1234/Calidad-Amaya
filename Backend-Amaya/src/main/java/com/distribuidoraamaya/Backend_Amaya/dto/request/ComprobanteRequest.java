@@ -25,6 +25,8 @@ public class ComprobanteRequest {
 
     private Long idProveedor;
 
+    private Long idCliente;
+
     @Size(max = 300, message = "Máximo 300 caracteres")
     private String observacion;
 
