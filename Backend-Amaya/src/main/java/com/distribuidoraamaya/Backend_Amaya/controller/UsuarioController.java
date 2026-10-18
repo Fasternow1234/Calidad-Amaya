@@ -41,8 +41,7 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponse> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody UsuarioRequest request,
-            @AuthenticationPrincipal UserDetails usuarioActual
-    ) {
+            @AuthenticationPrincipal UserDetails usuarioActual) {
         return ResponseEntity.ok(usuarioService.actualizar(id, request, usuarioActual.getUsername()));
     }
 
@@ -50,8 +49,7 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponse> cambiarEstado(
             @PathVariable Long id,
             @RequestParam Integer estado,
-            @AuthenticationPrincipal UserDetails usuarioActual
-    ) {
+            @AuthenticationPrincipal UserDetails usuarioActual) {
         if (estado != 0 && estado != 1) {
             throw new IllegalArgumentException("El estado debe ser 0 (inactivo) o 1 (activo)");
         }

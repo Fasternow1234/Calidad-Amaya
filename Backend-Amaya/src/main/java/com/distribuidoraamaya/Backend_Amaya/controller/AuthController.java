@@ -25,81 +25,80 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
-    private final JwtService jwtService;
-    private final UsuarioRepository usuarioRepository;
-    private final RolOpcionRepository rolOpcionRepository;
+        private final AuthenticationManager authenticationManager;
+        private final UserDetailsService userDetailsService;
+        private final JwtService jwtService;
+        private final UsuarioRepository usuarioRepository;
+        private final RolOpcionRepository rolOpcionRepository;
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        @PostMapping("/login")
+        public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getNombreUsuario(),
-                        request.getPassword())
-        );
+                authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                request.getNombreUsuario(),
+                                                request.getPassword()));
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getNombreUsuario());
-        Usuario usuario = usuarioRepository.findByNombreUsuario(request.getNombreUsuario()).orElseThrow();
+                UserDetails userDetails = userDetailsService.loadUserByUsername(request.getNombreUsuario());
+                Usuario usuario = usuarioRepository.findByNombreUsuario(request.getNombreUsuario()).orElseThrow();
 
-        String token = jwtService.generateToken(userDetails);
+                String token = jwtService.generateToken(userDetails);
 
-        List<OpcionResponse> opciones = rolOpcionRepository
-                .findByRolIdConOpcion(usuario.getRol().getId())
-                .stream()
-                .map(RolOpcion::getOpcion)
-                .filter(o -> o.getEstado() == 1)
-                .map(o -> OpcionResponse.builder()
-                        .id(o.getId())
-                        .codigo(o.getCodigo())
-                        .nombre(o.getNombre())
-                        .orden(o.getOrden())
-                        .build())
-                .toList();
+                List<OpcionResponse> opciones = rolOpcionRepository
+                                .findByRolIdConOpcion(usuario.getRol().getId())
+                                .stream()
+                                .map(RolOpcion::getOpcion)
+                                .filter(o -> o.getEstado() == 1)
+                                .map(o -> OpcionResponse.builder()
+                                                .id(o.getId())
+                                                .codigo(o.getCodigo())
+                                                .nombre(o.getNombre())
+                                                .orden(o.getOrden())
+                                                .build())
+                                .toList();
 
-        return ResponseEntity.ok(LoginResponse.builder()
-                .accessToken(token)
-                .tokenType("Bearer")
-                .expiresIn(jwtService.getExpirationMs() / 1000)
-                .usuario(LoginResponse.UsuarioInfo.builder()
-                        .id(usuario.getId())
-                        .nombreUsuario(usuario.getNombreUsuario())
-                        .nombreEmpleado(usuario.getNombreEmpleado())
-                        .email(usuario.getEmail())
-                        .estado(usuario.getEstado())
-                        .rol(usuario.getRol().getNombre())
-                        .opciones(opciones)
-                        .build())
-                .build());
-    }
+                return ResponseEntity.ok(LoginResponse.builder()
+                                .accessToken(token)
+                                .tokenType("Bearer")
+                                .expiresIn(jwtService.getExpirationMs() / 1000)
+                                .usuario(LoginResponse.UsuarioInfo.builder()
+                                                .id(usuario.getId())
+                                                .nombreUsuario(usuario.getNombreUsuario())
+                                                .nombreEmpleado(usuario.getNombreEmpleado())
+                                                .email(usuario.getEmail())
+                                                .estado(usuario.getEstado())
+                                                .rol(usuario.getRol().getNombre())
+                                                .opciones(opciones)
+                                                .build())
+                                .build());
+        }
 
-    @GetMapping("/me")
-    public ResponseEntity<LoginResponse.UsuarioInfo> me(@AuthenticationPrincipal UserDetails userDetails) {
+        @GetMapping("/me")
+        public ResponseEntity<LoginResponse.UsuarioInfo> me(@AuthenticationPrincipal UserDetails userDetails) {
 
-        Usuario usuario = usuarioRepository.findByNombreUsuario(userDetails.getUsername()).orElseThrow();
+                Usuario usuario = usuarioRepository.findByNombreUsuario(userDetails.getUsername()).orElseThrow();
 
-        List<OpcionResponse> opciones = rolOpcionRepository
-                .findByRolIdConOpcion(usuario.getRol().getId())
-                .stream()
-                .map(RolOpcion::getOpcion)
-                .filter(o -> o.getEstado() == 1)
-                .map(o -> OpcionResponse.builder()
-                        .id(o.getId())
-                        .codigo(o.getCodigo())
-                        .nombre(o.getNombre())
-                        .orden(o.getOrden())
-                        .build())
-                .toList();
+                List<OpcionResponse> opciones = rolOpcionRepository
+                                .findByRolIdConOpcion(usuario.getRol().getId())
+                                .stream()
+                                .map(RolOpcion::getOpcion)
+                                .filter(o -> o.getEstado() == 1)
+                                .map(o -> OpcionResponse.builder()
+                                                .id(o.getId())
+                                                .codigo(o.getCodigo())
+                                                .nombre(o.getNombre())
+                                                .orden(o.getOrden())
+                                                .build())
+                                .toList();
 
-        return ResponseEntity.ok(LoginResponse.UsuarioInfo.builder()
-                .id(usuario.getId())
-                .nombreUsuario(usuario.getNombreUsuario())
-                .nombreEmpleado(usuario.getNombreEmpleado())
-                .email(usuario.getEmail())
-                .estado(usuario.getEstado())
-                .rol(usuario.getRol().getNombre())
-                .opciones(opciones)
-                .build());
-    }
+                return ResponseEntity.ok(LoginResponse.UsuarioInfo.builder()
+                                .id(usuario.getId())
+                                .nombreUsuario(usuario.getNombreUsuario())
+                                .nombreEmpleado(usuario.getNombreEmpleado())
+                                .email(usuario.getEmail())
+                                .estado(usuario.getEstado())
+                                .rol(usuario.getRol().getNombre())
+                                .opciones(opciones)
+                                .build());
+        }
 }
