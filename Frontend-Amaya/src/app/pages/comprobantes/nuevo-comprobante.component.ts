@@ -75,7 +75,7 @@ export class NuevoComprobanteComponent implements OnInit {
   get fechaEmision() { return this.form.controls.fechaEmision; }
   get observacion() { return this.form.controls.observacion; }
 
-  readonly observacionLargo = computed(() => this.form.controls.observacion.value.length);
+  readonly observacionLargo = () => this.form.controls.observacion.value.length;
 
   readonly lineas = computed<FormGroup[]>(() => {
     this._refreshLineas();

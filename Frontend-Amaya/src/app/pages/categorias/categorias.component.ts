@@ -100,7 +100,7 @@ export class CategoriasComponent implements OnInit {
     nombre: ['', [Validators.required, Validators.maxLength(100)]]
   });
 
-  readonly nombreLargo = computed(() => this.form.controls.nombre.value.length);
+  readonly nombreLargo = () => this.form.controls.nombre.value.length;
 
   get nombre() { return this.form.controls.nombre; }
 

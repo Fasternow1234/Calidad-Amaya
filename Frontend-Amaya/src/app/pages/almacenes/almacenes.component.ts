@@ -159,8 +159,8 @@ export class AlmacenesComponent implements OnInit {
     direccion: ['', [Validators.maxLength(200)]]
   });
 
-  readonly nombreLargo = computed(() => this.form.controls.nombre.value.length);
-  readonly direccionLargo = computed(() => this.form.controls.direccion.value.length);
+  readonly nombreLargo = () => this.form.controls.nombre.value.length;
+  readonly direccionLargo = () => this.form.controls.direccion.value.length;
 
   readonly sugerenciasNombre = computed(() => {
     const base = ['Almacén Casa', 'Almacén Principal', 'Almacén Secundario', 'Almacén Unicachi', 'Almacén Tránsito'];
