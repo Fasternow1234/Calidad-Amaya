@@ -129,8 +129,8 @@ export class ProductosComponent implements OnInit {
     idAlmacen: [0, [Validators.required, Validators.min(1)]]
   });
 
-  readonly nombreLargo = computed(() => this.form.controls.nombre.value.length);
-  readonly descripcionLargo = computed(() => this.form.controls.descripcion.value.length);
+  readonly nombreLargo = () => this.form.controls.nombre.value.length;
+  readonly descripcionLargo = () => this.form.controls.descripcion.value.length;
 
   get nombre() { return this.form.controls.nombre; }
   get descripcion() { return this.form.controls.descripcion; }

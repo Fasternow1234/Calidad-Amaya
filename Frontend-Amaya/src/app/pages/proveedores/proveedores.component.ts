@@ -140,12 +140,12 @@ export class ProveedoresComponent implements OnInit {
     email: ['', [Validators.email, Validators.maxLength(150)]]
   });
 
-  readonly rucLargo = computed(() => this.form.controls.ruc.value.length);
-  readonly razonLargo = computed(() => this.form.controls.razonSocial.value.length);
-  readonly nombreComercialLargo = computed(() => this.form.controls.nombreComercial.value.length);
-  readonly direccionLargo = computed(() => this.form.controls.direccion.value.length);
-  readonly telefonoLargo = computed(() => this.form.controls.telefono.value.length);
-  readonly emailLargo = computed(() => this.form.controls.email.value.length);
+  readonly rucLargo = () => this.form.controls.ruc.value.length;
+  readonly razonLargo = () => this.form.controls.razonSocial.value.length;
+  readonly nombreComercialLargo = () => this.form.controls.nombreComercial.value.length;
+  readonly direccionLargo = () => this.form.controls.direccion.value.length;
+  readonly telefonoLargo = () => this.form.controls.telefono.value.length;
+  readonly emailLargo = () => this.form.controls.email.value.length;
 
   get ruc() { return this.form.controls.ruc; }
   get razonSocial() { return this.form.controls.razonSocial; }
