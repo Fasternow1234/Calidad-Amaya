@@ -7,6 +7,7 @@ import { AlmacenService } from '../../services/almacen.service';
 import { Producto } from '../../models/producto.models';
 import { Categoria } from '../../models/categoria.models';
 import { Almacen } from '../../models/almacen.models';
+import { AuthService } from '../../services/auth.service';
 
 type ToastTipo = 'success' | 'error';
 type ConfirmAccion = 'eliminar' | 'reactivar';
@@ -37,6 +38,7 @@ export class ProductosComponent implements OnInit {
   private readonly productoService = inject(ProductoService);
   private readonly categoriaService = inject(CategoriaService);
   private readonly almacenService = inject(AlmacenService);
+  private readonly authService = inject(AuthService);
 
   readonly productos = signal<Producto[]>([]);
   readonly categorias = signal<Categoria[]>([]);
@@ -53,6 +55,7 @@ export class ProductosComponent implements OnInit {
   readonly productoViendo = signal<Producto | null>(null);
   readonly ordenCampo = signal<OrdenCampo>('nombre');
   readonly ordenDireccion = signal<OrdenDireccion>('asc');
+  readonly puedeGestionarCatalogo = computed(() => this.authService.usuario()?.rol !== 'VENDEDOR');
 
   private toastTimeout: any = null;
   private toastAccionTimeout: any = null;
@@ -158,20 +161,22 @@ export class ProductosComponent implements OnInit {
 
   cargarTodo(): void {
     this.cargando.set(true);
-    this.categoriaService.listarActivas().subscribe({
-      next: (data) => this.categorias.set(data ?? []),
-      error: () => this.categorias.set([])
-    });
-    this.almacenService.listarActivos().subscribe({
-      next: (data) => this.almacenes.set(data ?? []),
-      error: () => this.almacenes.set([])
-    });
+    if (this.puedeGestionarCatalogo()) {
+      this.categoriaService.listarActivas().subscribe({
+        next: (data) => this.categorias.set(data ?? []),
+        error: () => this.categorias.set([])
+      });
+      this.almacenService.listarActivos().subscribe({
+        next: (data) => this.almacenes.set(data ?? []),
+        error: () => this.almacenes.set([])
+      });
+    }
     this.cargar();
   }
 
   cargar(): void {
     this.cargando.set(true);
-    const peticion = this.mostrarInactivos()
+    const peticion = this.puedeGestionarCatalogo() && this.mostrarInactivos()
       ? this.productoService.listarTodos()
       : this.productoService.listarActivos();
     peticion.subscribe({

@@ -22,6 +22,9 @@ public class ComprobanteResponse {
     private Long idProveedor;
     private String razonSocialProveedor;
     private String rucProveedor;
+    private Long idCliente;
+    private String nombreCliente;
+    private String documentoCliente;
     private String observacion;
     private BigDecimal total;
     private Integer estado;

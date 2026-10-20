@@ -13,12 +13,14 @@ public interface ComprobanteRepository extends JpaRepository<Comprobante, Long> 
 
     @Query("SELECT DISTINCT c FROM Comprobante c " +
            "LEFT JOIN FETCH c.proveedor p " +
+           "LEFT JOIN FETCH c.cliente cl " +
            "LEFT JOIN FETCH c.usuario u " +
            "ORDER BY c.fechaRegistro DESC, c.id DESC")
     List<Comprobante> findAllConCabecera();
 
     @Query("SELECT c FROM Comprobante c " +
            "LEFT JOIN FETCH c.proveedor p " +
+           "LEFT JOIN FETCH c.cliente cl " +
            "LEFT JOIN FETCH c.usuario u " +
            "LEFT JOIN FETCH c.detalles d " +
            "LEFT JOIN FETCH d.producto pr " +

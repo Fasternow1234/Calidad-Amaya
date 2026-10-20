@@ -63,6 +63,10 @@
             <div class="view-row"><span class="view-label">Proveedor</span><span class="view-value view-value-strong">{{ comprobanteViendo()!.razonSocialProveedor }}</span></div>
             <div class="view-row"><span class="view-label">RUC</span><span class="view-value"><span class="ruc-badge">{{ comprobanteViendo()!.rucProveedor }}</span></span></div>
           }
+          @if (comprobanteViendo()!.nombreCliente) {
+            <div class="view-row"><span class="view-label">Cliente</span><span class="view-value view-value-strong">{{ comprobanteViendo()!.nombreCliente }}</span></div>
+            <div class="view-row"><span class="view-label">Documento</span><span class="view-value">{{ comprobanteViendo()!.documentoCliente }}</span></div>
+          }
           <div class="view-row"><span class="view-label">Registrado por</span><span class="view-value">{{ comprobanteViendo()!.usuario || '—' }}</span></div>
           <div class="view-row"><span class="view-label">Fecha registro</span><span class="view-value">{{ comprobanteViendo()!.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span></div>
           @if (comprobanteViendo()!.observacion) {
@@ -105,6 +109,12 @@
           </table>
         </div>
         <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar btn-imprimir" (click)="imprimirComprobante('voucher')" title="Imprimir en impresora térmica de 80 mm">
+              Voucher 80 mm
+            </button>
+          <button type="button" class="btn-modal-confirmar btn-pdf" (click)="imprimirComprobante('a4')" title="Imprimir o guardar como PDF">
+              PDF / A4
+          </button>
           <button type="button" class="btn-modal-cancelar" (click)="cerrarDetalle()">Cerrar</button>
         </div>
       </div>
@@ -261,7 +271,7 @@
                 Número <span class="sort-icon">{{ iconoOrden('numero') }}</span>
               </th>
               <th scope="col" class="col-tipo">Tipo</th>
-              <th scope="col">Proveedor</th>
+              <th scope="col">Cliente / proveedor</th>
               <th scope="col" class="col-total th-sort" (click)="ordenarPor('total')">
                 Total <span class="sort-icon">{{ iconoOrden('total') }}</span>
               </th>
@@ -283,7 +293,12 @@
                   }
                 </td>
                 <td>
-                  @if (c.razonSocialProveedor) {
+                  @if (c.nombreCliente) {
+                    <div class="prov-cell">
+                      <span class="prov-nombre">{{ c.nombreCliente }}</span>
+                      <small class="prov-ruc">{{ c.documentoCliente }}</small>
+                    </div>
+                  } @else if (c.razonSocialProveedor) {
                     <div class="prov-cell">
                       <span class="prov-nombre">{{ c.razonSocialProveedor }}</span>
                       <small class="prov-ruc">{{ c.rucProveedor }}</small>

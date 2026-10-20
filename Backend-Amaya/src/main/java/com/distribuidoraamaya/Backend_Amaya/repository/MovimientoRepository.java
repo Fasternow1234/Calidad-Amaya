@@ -14,4 +14,8 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
            "LEFT JOIN FETCH m.usuario u " +
            "ORDER BY m.fecha DESC, m.id DESC")
     List<Movimiento> findAllConDetalle();
+
+    List<Movimiento> findByProductoIdOrderByFechaAscIdAsc(Long idProducto);
+
+    List<Movimiento> findByProductoIdAndAlmacenIdOrderByFechaAscIdAsc(Long idProducto, Long idAlmacen);
 }

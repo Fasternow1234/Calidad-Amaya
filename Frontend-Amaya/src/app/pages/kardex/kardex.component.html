@@ -1,0 +1,93 @@
+<section class="kardex-page">
+  <header class="page-header">
+    <div class="page-icon" aria-hidden="true">↕</div>
+    <div>
+      <span class="eyebrow">Inventario</span>
+      <h1>Kardex físico</h1>
+      <p>Consulta las entradas, salidas y el saldo acumulado de un producto.</p>
+    </div>
+  </header>
+
+  <section class="filters-card" aria-label="Filtros del Kardex">
+    <div class="filter-grid">
+      <label>Producto <span class="required">*</span>
+        <select [(ngModel)]="productoSeleccionado" [disabled]="cargandoCatalogos()">
+          <option [ngValue]="null">Selecciona un producto</option>
+          @for (producto of productos(); track producto.id) {
+            <option [ngValue]="producto.id">{{ producto.codigo }} — {{ producto.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label>Almacén
+        <select [(ngModel)]="almacenSeleccionado" [disabled]="cargandoCatalogos()">
+          <option [ngValue]="0">Todos los almacenes</option>
+          @for (almacen of almacenes(); track almacen.id) {
+            <option [ngValue]="almacen.id">{{ almacen.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label>Desde
+        <input type="date" [(ngModel)]="desde" />
+      </label>
+      <label>Hasta
+        <input type="date" [(ngModel)]="hasta" />
+      </label>
+      <button type="button" class="btn-primary" (click)="consultar()" [disabled]="consultando() || cargandoCatalogos()">
+        {{ consultando() ? 'Consultando…' : 'Consultar Kardex' }}
+      </button>
+    </div>
+  </section>
+
+  @if (error()) { <div class="notice-error" role="alert">{{ error() }}</div> }
+
+  @if (consultando()) {
+    <div class="loading-card">Calculando movimientos y saldos…</div>
+  }
+
+  @if (kardex(); as resultado) {
+    <section class="product-summary">
+      <div>
+        <span class="product-code">{{ resultado.codigoProducto }}</span>
+        <h2>{{ resultado.nombreProducto }}</h2>
+        <p>{{ resultado.nombreAlmacen }} · Unidad: {{ resultado.unidadMedida }}</p>
+      </div>
+      <div class="period">{{ resultado.desde ? (resultado.desde | date:'dd/MM/yyyy') : 'Inicio' }} – {{ resultado.hasta ? (resultado.hasta | date:'dd/MM/yyyy') : 'Hoy' }}</div>
+    </section>
+
+    <section class="summary-grid" aria-label="Resumen del Kardex">
+      <article><span>Saldo inicial</span><strong>{{ resultado.saldoInicial | number:'1.0-2' }} <small>{{ resultado.unidadMedida }}</small></strong></article>
+      <article class="entry"><span>Entradas</span><strong>+ {{ resultado.totalEntradas | number:'1.0-2' }} <small>{{ resultado.unidadMedida }}</small></strong></article>
+      <article class="exit"><span>Salidas</span><strong>− {{ resultado.totalSalidas | number:'1.0-2' }} <small>{{ resultado.unidadMedida }}</small></strong></article>
+      <article class="balance"><span>Saldo final</span><strong>{{ resultado.saldoFinal | number:'1.0-2' }} <small>{{ resultado.unidadMedida }}</small></strong></article>
+    </section>
+
+    <section class="table-card">
+      <div class="table-heading">
+        <div><h2>Detalle cronológico</h2><p>{{ resultado.movimientos.length }} movimiento(s)</p></div>
+      </div>
+      @if (resultado.movimientos.length === 0) {
+        <div class="empty-state">No hay movimientos registrados para este producto y período. El saldo inicial refleja las existencias sin movimientos disponibles.</div>
+      } @else {
+        <div class="table-scroll">
+          <table>
+            <caption class="sr-only">Kardex físico ordenado cronológicamente</caption>
+            <thead><tr><th>Fecha y hora</th><th>Referencia</th><th>Almacén</th><th class="numeric">Entrada</th><th class="numeric">Salida</th><th class="numeric">Saldo</th></tr></thead>
+            <tbody>
+              @for (movimiento of resultado.movimientos; track movimiento.id) {
+                <tr>
+                  <td>{{ movimiento.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td><span class="movement-type" [class.entry-type]="movimiento.tipo === 'ENTRADA'" [class.exit-type]="movimiento.tipo === 'SALIDA'">{{ movimiento.tipo === 'ENTRADA' ? 'Entrada' : 'Salida' }}</span><small>{{ movimiento.referencia || 'Sin referencia' }}</small></td>
+                  <td>{{ movimiento.nombreAlmacen }}</td>
+                  <td class="numeric entry-value">{{ movimiento.entrada ? (movimiento.entrada | number:'1.0-2') : '—' }}</td>
+                  <td class="numeric exit-value">{{ movimiento.salida ? (movimiento.salida | number:'1.0-2') : '—' }}</td>
+                  <td class="numeric balance-value">{{ movimiento.saldo | number:'1.0-2' }} {{ resultado.unidadMedida }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <p class="history-note">El saldo se reconstruye a partir de los movimientos guardados. Si el producto tenía existencias previas al primer movimiento, se toman como saldo de apertura.</p>
+    </section>
+  }
+</section>

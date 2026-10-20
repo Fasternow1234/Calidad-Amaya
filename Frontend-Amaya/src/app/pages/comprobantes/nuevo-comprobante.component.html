@@ -10,7 +10,9 @@
       <div class="form-group">
         <label for="tipo">Tipo de operación <span class="requerido">*</span></label>
         <select id="tipo" formControlName="tipo" class="select-input">
-          <option value="COMPRA">Compra (ingresa mercadería)</option>
+          @if (authService.usuario()?.rol === 'ADMINISTRADOR') {
+            <option value="COMPRA">Compra (ingresa mercadería)</option>
+          }
           <option value="VENTA">Venta (sale mercadería)</option>
         </select>
       </div>
@@ -74,6 +76,24 @@
               <option [ngValue]="p.id">{{ p.razonSocial }} — {{ p.ruc }}</option>
             }
           </select>
+        </div>
+      }
+
+      @if (tipo.value === 'VENTA') {
+        <div class="form-group wide">
+          <label for="idCliente">Cliente <span class="requerido">*</span></label>
+          <select id="idCliente" formControlName="idCliente" class="select-input">
+            <option [ngValue]="0">— Selecciona un cliente —</option>
+            @for (cliente of clientes(); track cliente.id) {
+              <option [ngValue]="cliente.id">{{ cliente.nombreMostrar }} — {{ cliente.tipoDocumento }} {{ cliente.numeroDocumento }}</option>
+            }
+          </select>
+          @if (form.controls.idCliente.touched && form.controls.idCliente.invalid) {
+            <small class="error" role="alert">Selecciona el cliente para esta venta.</small>
+          }
+          @if (clientes().length === 0) {
+            <small class="stock-info">No hay clientes activos. Registra o reactiva un cliente antes de continuar.</small>
+          }
         </div>
       }
 

@@ -7,6 +7,9 @@ import { ProductoService } from '../../services/producto.service';
 import { Proveedor } from '../../models/proveedor.models';
 import { Producto } from '../../models/producto.models';
 import { Comprobante } from '../../models/comprobante.models';
+import { AuthService } from '../../services/auth.service';
+import { ClienteService } from '../../services/cliente.service';
+import { Cliente } from '../../models/cliente.models';
 
 function hoyLocal(): string {
   const d = new Date();
@@ -28,6 +31,8 @@ export class NuevoComprobanteComponent implements OnInit {
   private readonly comprobanteService = inject(ComprobanteService);
   private readonly proveedorService = inject(ProveedorService);
   private readonly productoService = inject(ProductoService);
+  private readonly clienteService = inject(ClienteService);
+  readonly authService = inject(AuthService);
 
   readonly comprobantesExistentes = input<Comprobante[]>([]);
 
@@ -36,6 +41,7 @@ export class NuevoComprobanteComponent implements OnInit {
 
   readonly proveedores = signal<Proveedor[]>([]);
   readonly productos = signal<Producto[]>([]);
+  readonly clientes = signal<Cliente[]>([]);
   readonly guardando = signal(false);
   readonly errorMsg = signal<string | null>(null);
 
@@ -59,6 +65,7 @@ export class NuevoComprobanteComponent implements OnInit {
     tipo: ['COMPRA' as 'COMPRA' | 'VENTA', [Validators.required]],
     fechaEmision: [hoyLocal(), [Validators.required]],
     idProveedor: [0],
+    idCliente: [0],
     observacion: ['', [Validators.maxLength(300)]],
     detalles: this.fb.array<FormGroup>([])
   });
@@ -93,13 +100,25 @@ export class NuevoComprobanteComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.proveedorService.listarActivos().subscribe({
-      next: (data) => this.proveedores.set(data ?? []),
-      error: () => this.errorMsg.set('Error al cargar proveedores')
-    });
+    const esVendedor = this.authService.usuario()?.rol === 'VENDEDOR';
+    if (esVendedor) {
+      this.form.controls.tipo.setValue('VENTA');
+      this.form.controls.idCliente.setValidators([Validators.required, this.noCero]);
+      this.form.controls.idCliente.updateValueAndValidity();
+    }
+    if (!esVendedor) {
+      this.proveedorService.listarActivos().subscribe({
+        next: (data) => this.proveedores.set(data ?? []),
+        error: () => this.errorMsg.set('Error al cargar proveedores')
+      });
+    }
     this.productoService.listarActivos().subscribe({
       next: (data) => this.productos.set(data ?? []),
       error: () => this.errorMsg.set('Error al cargar productos')
+    });
+    this.clienteService.listarActivos().subscribe({
+      next: (data) => this.clientes.set(data ?? []),
+      error: () => this.errorMsg.set('Error al cargar clientes')
     });
 
     this.agregarDetalle();
@@ -112,7 +131,12 @@ export class NuevoComprobanteComponent implements OnInit {
     this.form.controls.tipo.valueChanges.subscribe((tipoActual) => {
       if (tipoActual === 'VENTA') {
         this.form.controls.idProveedor.setValue(0);
+        this.form.controls.idCliente.setValidators([Validators.required, this.noCero]);
+      } else {
+        this.form.controls.idCliente.setValue(0);
+        this.form.controls.idCliente.clearValidators();
       }
+      this.form.controls.idCliente.updateValueAndValidity({ emitEvent: false });
       this.detalles.controls.forEach((ctrl) => {
         const idProducto = Number(ctrl.get('idProducto')?.value ?? 0);
         const producto = this.productos().find((p) => p.id === idProducto);
@@ -227,6 +251,10 @@ export class NuevoComprobanteComponent implements OnInit {
       this.errorMsg.set('Debe seleccionar un proveedor para la compra');
       return;
     }
+    if (raw.tipo === 'VENTA' && (!raw.idCliente || raw.idCliente === 0)) {
+      this.errorMsg.set('Debes seleccionar el cliente de la venta.');
+      return;
+    }
 
     if (raw.tipo === 'VENTA') {
       for (const d of detallesRaw) {
@@ -259,6 +287,7 @@ export class NuevoComprobanteComponent implements OnInit {
       numero: numeroFinal,
       fechaEmision: raw.fechaEmision,
       idProveedor: raw.tipo === 'COMPRA' ? raw.idProveedor : null,
+      idCliente: raw.tipo === 'VENTA' ? raw.idCliente : null,
       observacion: raw.observacion?.trim() || null,
       detalles: detallesRaw.map((d) => ({
         idProducto: Number(d.idProducto),

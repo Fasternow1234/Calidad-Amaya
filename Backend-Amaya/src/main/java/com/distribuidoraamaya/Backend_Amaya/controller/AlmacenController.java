@@ -6,12 +6,14 @@ import com.distribuidoraamaya.Backend_Amaya.service.AlmacenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/almacenes")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ALMACENERO')")
 @RequiredArgsConstructor
 public class AlmacenController {
 

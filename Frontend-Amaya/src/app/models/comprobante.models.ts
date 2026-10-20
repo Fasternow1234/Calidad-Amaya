@@ -19,6 +19,9 @@ export interface Comprobante {
   idProveedor: number | null;
   razonSocialProveedor: string | null;
   rucProveedor: string | null;
+  idCliente: number | null;
+  nombreCliente: string | null;
+  documentoCliente: string | null;
   observacion: string | null;
   total: number;
   estado: number;
@@ -39,6 +42,7 @@ export interface ComprobanteRequest {
   numero: string;
   fechaEmision: string;
   idProveedor: number | null;
+  idCliente: number | null;
   observacion: string | null;
   detalles: DetalleComprobanteRequest[];
 }
