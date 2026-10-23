@@ -122,7 +122,7 @@ public class KardexService {
     }
 
     private BigDecimal sumar(Map<Long, BigDecimal> saldos) {
-        return saldos.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        return saldos.values().stream().reduce(BigDecimal.ZERO, (total, saldo) -> total.add(saldo));
     }
 
     private BigDecimal cero(BigDecimal valor) {

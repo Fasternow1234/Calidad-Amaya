@@ -10,13 +10,11 @@ import com.distribuidoraamaya.Backend_Amaya.repository.OpcionRepository;
 import com.distribuidoraamaya.Backend_Amaya.repository.RolOpcionRepository;
 import com.distribuidoraamaya.Backend_Amaya.repository.RolRepository;
 import com.distribuidoraamaya.Backend_Amaya.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
     private final RolRepository rolRepository;
@@ -25,6 +23,21 @@ public class DataInitializer implements CommandLineRunner {
     private final UsuarioRepository usuarioRepository;
     private final AlmacenRepository almacenRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public DataInitializer(
+            RolRepository rolRepository,
+            OpcionRepository opcionRepository,
+            RolOpcionRepository rolOpcionRepository,
+            UsuarioRepository usuarioRepository,
+            AlmacenRepository almacenRepository,
+            PasswordEncoder passwordEncoder) {
+        this.rolRepository = rolRepository;
+        this.opcionRepository = opcionRepository;
+        this.rolOpcionRepository = rolOpcionRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.almacenRepository = almacenRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public void run(String... args) {
