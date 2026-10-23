@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mysql:8.3.0
+    command: ["--log-bin-trust-function-creators=1"]
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: testlink
+      MYSQL_USER: teste
+      MYSQL_PASSWORD: teste
+      MYSQL_ROOT_PASSWORD: teste
+    volumes:
+      - testlink-db:/var/lib/mysql
+    networks:
+      - testlink
+
+  app:
+    image: ghcr.io/neiesc/testlink-code:testlink_1_9_20_fixed
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "127.0.0.1:8090:80"
+    volumes:
+      - testlink-logs:/var/testlink/logs
+      - testlink-uploads:/var/testlink/upload_area
+    networks:
+      - testlink
+
+networks:
+  testlink:
+
+volumes:
+  testlink-db:
+  testlink-logs:
+  testlink-uploads:

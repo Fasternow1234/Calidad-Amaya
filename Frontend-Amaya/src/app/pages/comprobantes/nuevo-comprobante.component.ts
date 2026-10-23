@@ -7,6 +7,13 @@ import { ProductoService } from '../../services/producto.service';
 import { Proveedor } from '../../models/proveedor.models';
 import { Producto } from '../../models/producto.models';
 import { Comprobante } from '../../models/comprobante.models';
+<<<<<<< Updated upstream
+=======
+import { AuthService } from '../../services/auth.service';
+import { ClienteService } from '../../services/cliente.service';
+import { Cliente } from '../../models/cliente.models';
+import { cantidadEnteraPositiva } from './cantidad-entera.validator';
+>>>>>>> Stashed changes
 
 function hoyLocal(): string {
   const d = new Date();
@@ -159,7 +166,7 @@ export class NuevoComprobanteComponent implements OnInit {
   agregarDetalle(): void {
     const grupo = this.fb.nonNullable.group({
       idProducto: [0, [Validators.required, this.noCero]],
-      cantidad: [1, [Validators.required, Validators.min(0.01)]],
+      cantidad: [1, [Validators.required, Validators.min(1), cantidadEnteraPositiva]],
       precioUnitario: [0, [Validators.required, Validators.min(0)]]
     });
     this.detalles.push(grupo);

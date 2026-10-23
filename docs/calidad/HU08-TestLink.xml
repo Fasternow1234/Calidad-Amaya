@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcases>
+  <testcase name="CP-HU08-01 - Registrar venta con stock suficiente">
+    <summary>Verificar el registro de una venta con productos y cantidades válidas, y comprobar su efecto en stock y Kardex. Caso ejecutado manualmente en la aplicación.</summary>
+    <preconditions>Disponer de un usuario autorizado y de un producto activo con al menos 2 unidades. Para reproducir la ejecución registrada, usar Coca Cola 2L con 180 unidades y un cliente disponible.</preconditions>
+    <execution_type>1</execution_type>
+    <importance>2</importance>
+    <steps>
+      <step>
+        <step_number>1</step_number>
+        <actions>Abrir Comprobantes, seleccionar Nuevo comprobante, elegir Venta y completar los campos obligatorios con un cliente válido.</actions>
+        <expectedresults>El formulario permite seleccionar el producto y completar los datos del comprobante.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+      <step>
+        <step_number>2</step_number>
+        <actions>Agregar Coca Cola 2L, ingresar cantidad 2 y registrar el comprobante.</actions>
+        <expectedresults>El sistema confirma la venta y muestra un comprobante registrado.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+      <step>
+        <step_number>3</step_number>
+        <actions>Consultar el stock del producto y su Kardex.</actions>
+        <expectedresults>El stock disminuye de 180 a 178 y el Kardex presenta una salida de 2 unidades asociada a la venta.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+    </steps>
+  </testcase>
+  <testcase name="CP-HU08-02 - Rechazar venta que supera el stock disponible">
+    <summary>Verificar que el sistema impida registrar una venta cuya cantidad supera las existencias disponibles. Caso ejecutado manualmente en la aplicación.</summary>
+    <preconditions>Iniciar con Coca Cola 2L en stock de 178 unidades y contar con un usuario, cliente y comprobante de venta válidos.</preconditions>
+    <execution_type>1</execution_type>
+    <importance>2</importance>
+    <steps>
+      <step>
+        <step_number>1</step_number>
+        <actions>Abrir un nuevo comprobante de venta y completar sus campos obligatorios.</actions>
+        <expectedresults>El formulario permite preparar la venta.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+      <step>
+        <step_number>2</step_number>
+        <actions>Seleccionar Coca Cola 2L, ingresar 179 unidades y pulsar Registrar comprobante.</actions>
+        <expectedresults>La operación se rechaza y el mensaje indica stock insuficiente, disponible 178 unidades y solicitado 179. No se registra la venta ni se descuenta stock.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+    </steps>
+  </testcase>
+  <testcase name="CP-HU08-03 - Rechazar cantidad fraccionaria">
+    <summary>Verificar mediante Selenium WebDriver que el formulario rechace cantidades fraccionarias y no cree un comprobante.</summary>
+    <preconditions>Iniciar backend y frontend según Frontend-Amaya/e2e/selenium/README.md, usando exclusivamente el perfil y la base de datos aislada de pruebas. Preparar los datos ficticios indicados allí.</preconditions>
+    <execution_type>1</execution_type>
+    <importance>2</importance>
+    <steps>
+      <step>
+        <step_number>1</step_number>
+        <actions>Ejecutar el script reject-fractional-quantity.mjs con el ambiente de pruebas activo.</actions>
+        <expectedresults>Selenium intenta enviar una cantidad 1.5 y detecta el mensaje de validación que exige una cantidad entera.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+      <step>
+        <step_number>2</step_number>
+        <actions>Revisar la lista de comprobantes y la evidencia capturada por el script.</actions>
+        <expectedresults>El número de comprobantes no aumenta y se genera la captura cantidad-fraccionaria-rechazada.png.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+    </steps>
+  </testcase>
+  <testcase name="CP-HU08-04 - Registrar venta y verificar stock y Kardex con Selenium">
+    <summary>Verificar mediante Selenium WebDriver el registro de una venta válida de una unidad y sus efectos en comprobante, stock y Kardex.</summary>
+    <preconditions>Iniciar backend y frontend según Frontend-Amaya/e2e/selenium/README.md, usando exclusivamente el perfil y base de datos aislada de pruebas. Restablecer los datos semilla antes de repetir la prueba.</preconditions>
+    <execution_type>1</execution_type>
+    <importance>2</importance>
+    <steps>
+      <step>
+        <step_number>1</step_number>
+        <actions>Ejecutar register-valid-sale.mjs con los datos ficticios sembrados en el ambiente de prueba.</actions>
+        <expectedresults>El flujo registra una venta de 1 unidad y Selenium identifica el comprobante creado.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+      <step>
+        <step_number>2</step_number>
+        <actions>Verificar el stock del producto y abrir su Kardex.</actions>
+        <expectedresults>El stock disminuye en una unidad; el Kardex registra una salida de una unidad asociada al comprobante y muestra el saldo actualizado.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+      <step>
+        <step_number>3</step_number>
+        <actions>Revisar las capturas de comprobante, stock y Kardex creadas por el script.</actions>
+        <expectedresults>Se conservan venta-valida-comprobante.png, venta-valida-stock.png y venta-valida-kardex.png como evidencias de la ejecución.</expectedresults>
+        <execution_type>1</execution_type>
+      </step>
+    </steps>
+  </testcase>
+</testcases>
