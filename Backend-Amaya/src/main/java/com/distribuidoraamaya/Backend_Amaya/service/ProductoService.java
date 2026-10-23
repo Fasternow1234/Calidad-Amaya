@@ -217,9 +217,9 @@ public class ProductoService {
 
     private BigDecimal calcularStockTotal(Long idProducto) {
         return stockRepository.findByProductoId(idProducto).stream()
-                .map(Stock::getCantidad)
+                .map(stock -> stock.getCantidad())
                 .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, (total, cantidad) -> total.add(cantidad));
     }
 
     /**
@@ -259,8 +259,8 @@ public class ProductoService {
         if (p.getAlmacenPrincipal() != null) return p.getAlmacenPrincipal();
         List<Stock> stocks = stockRepository.findByProductoId(p.getId());
         return stocks.stream()
-                .min(Comparator.comparing(Stock::getId))
-                .map(Stock::getAlmacen)
+                .min(Comparator.comparing(stock -> stock.getId()))
+                .map(stock -> stock.getAlmacen())
                 .orElse(null);
     }
 

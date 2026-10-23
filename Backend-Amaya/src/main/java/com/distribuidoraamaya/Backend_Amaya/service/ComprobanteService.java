@@ -22,7 +22,6 @@ public class ComprobanteService {
 
     private final ComprobanteRepository comprobanteRepository;
     private final ProductoRepository productoRepository;
-    private final AlmacenRepository almacenRepository;
     private final ProveedorRepository proveedorRepository;
     private final ClienteRepository clienteRepository;
     private final UsuarioRepository usuarioRepository;
@@ -158,8 +157,8 @@ public class ComprobanteService {
         Almacen principal = producto.getAlmacenPrincipal();
         if (principal == null) {
             principal = stockRepository.findByProductoId(producto.getId()).stream()
-                    .min(Comparator.comparing(Stock::getId))
-                    .map(Stock::getAlmacen)
+                    .min(Comparator.comparing(stock -> stock.getId()))
+                    .map(stock -> stock.getAlmacen())
                     .orElseThrow(() -> new IllegalArgumentException(
                             "El producto " + producto.getNombre() + " no tiene almacén principal asignado"));
         }
@@ -170,8 +169,8 @@ public class ComprobanteService {
         List<Stock> stocks = stockRepository.findByProductoId(producto.getId());
         return stocks.stream()
                 .filter(s -> s.getCantidad() != null && s.getCantidad().compareTo(cantidad) >= 0)
-                .max(Comparator.comparing(Stock::getCantidad))
-                .map(Stock::getAlmacen)
+                .max(Comparator.comparing(stock -> stock.getCantidad()))
+                .map(stock -> stock.getAlmacen())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No hay stock suficiente de " + producto.getNombre() +
                         " en ningún almacén. Verifique el inventario."));
