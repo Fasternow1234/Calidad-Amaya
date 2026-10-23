@@ -27,10 +27,11 @@ export class KardexComponent implements OnInit {
   readonly consultando = signal(false);
   readonly error = signal<string | null>(null);
 
-  productoSeleccionado: number | null = null;
-  almacenSeleccionado = 0;
-  desde = '';
-  hasta = '';
+  // Signals para los filtros
+  readonly productoSeleccionado = signal<number | null>(null);
+  readonly almacenSeleccionado = signal<number>(0);
+  readonly desde = signal<string>('');
+  readonly hasta = signal<string>('');
 
   ngOnInit(): void {
     this.productoService.listarActivos().subscribe({
@@ -57,21 +58,24 @@ export class KardexComponent implements OnInit {
   consultar(): void {
     this.error.set(null);
     this.kardex.set(null);
-    if (!this.productoSeleccionado) {
+    const idProd = this.productoSeleccionado();
+    
+    if (!idProd) {
       this.error.set('Selecciona un producto para consultar su Kardex.');
       return;
     }
-    if (this.desde && this.hasta && this.desde > this.hasta) {
+    const d = this.desde();
+    const h = this.hasta();
+    if (d && h && d > h) {
       this.error.set('La fecha inicial no puede ser posterior a la fecha final.');
       return;
     }
-
     this.consultando.set(true);
     this.movimientoService.consultarKardex(
-      this.productoSeleccionado,
-      this.almacenSeleccionado > 0 ? this.almacenSeleccionado : null,
-      this.desde,
-      this.hasta
+      idProd,
+      this.almacenSeleccionado() > 0 ? this.almacenSeleccionado() : null,
+      d,
+      h
     ).subscribe({
       next: resultado => this.kardex.set(resultado),
       error: err => this.error.set(err.error?.message ?? 'No se pudo consultar el Kardex.'),

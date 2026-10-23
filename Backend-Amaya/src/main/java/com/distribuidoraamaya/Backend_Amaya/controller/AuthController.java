@@ -3,7 +3,6 @@ package com.distribuidoraamaya.Backend_Amaya.controller;
 import com.distribuidoraamaya.Backend_Amaya.dto.request.LoginRequest;
 import com.distribuidoraamaya.Backend_Amaya.dto.response.LoginResponse;
 import com.distribuidoraamaya.Backend_Amaya.dto.response.OpcionResponse;
-import com.distribuidoraamaya.Backend_Amaya.entity.RolOpcion;
 import com.distribuidoraamaya.Backend_Amaya.entity.Usuario;
 import com.distribuidoraamaya.Backend_Amaya.repository.RolOpcionRepository;
 import com.distribuidoraamaya.Backend_Amaya.repository.UsuarioRepository;
@@ -47,7 +46,7 @@ public class AuthController {
                 List<OpcionResponse> opciones = rolOpcionRepository
                                 .findByRolIdConOpcion(usuario.getRol().getId())
                                 .stream()
-                                .map(RolOpcion::getOpcion)
+                                .map(rolOpcion -> rolOpcion.getOpcion())
                                 .filter(o -> o.getEstado() == 1)
                                 .map(o -> OpcionResponse.builder()
                                                 .id(o.getId())
@@ -81,7 +80,7 @@ public class AuthController {
                 List<OpcionResponse> opciones = rolOpcionRepository
                                 .findByRolIdConOpcion(usuario.getRol().getId())
                                 .stream()
-                                .map(RolOpcion::getOpcion)
+                                .map(rolOpcion -> rolOpcion.getOpcion())
                                 .filter(o -> o.getEstado() == 1)
                                 .map(o -> OpcionResponse.builder()
                                                 .id(o.getId())

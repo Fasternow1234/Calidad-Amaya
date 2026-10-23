@@ -11,7 +11,7 @@
   <section class="filters-card" aria-label="Filtros del Kardex">
     <div class="filter-grid">
       <label>Producto <span class="required">*</span>
-        <select [(ngModel)]="productoSeleccionado" [disabled]="cargandoCatalogos()">
+        <select [ngModel]="productoSeleccionado()" (ngModelChange)="productoSeleccionado.set($event)" [disabled]="cargandoCatalogos()">
           <option [ngValue]="null">Selecciona un producto</option>
           @for (producto of productos(); track producto.id) {
             <option [ngValue]="producto.id">{{ producto.codigo }} — {{ producto.nombre }}</option>
@@ -19,7 +19,7 @@
         </select>
       </label>
       <label>Almacén
-        <select [(ngModel)]="almacenSeleccionado" [disabled]="cargandoCatalogos()">
+        <select [ngModel]="almacenSeleccionado()" (ngModelChange)="almacenSeleccionado.set($event)" [disabled]="cargandoCatalogos()">
           <option [ngValue]="0">Todos los almacenes</option>
           @for (almacen of almacenes(); track almacen.id) {
             <option [ngValue]="almacen.id">{{ almacen.nombre }}</option>
@@ -27,10 +27,10 @@
         </select>
       </label>
       <label>Desde
-        <input type="date" [(ngModel)]="desde" />
+        <input type="date" [ngModel]="desde()" (ngModelChange)="desde.set($event)" />
       </label>
       <label>Hasta
-        <input type="date" [(ngModel)]="hasta" />
+        <input type="date" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" />
       </label>
       <button type="button" class="btn-primary" (click)="consultar()" [disabled]="consultando() || cargandoCatalogos()">
         {{ consultando() ? 'Consultando…' : 'Consultar Kardex' }}
@@ -39,7 +39,6 @@
   </section>
 
   @if (error()) { <div class="notice-error" role="alert">{{ error() }}</div> }
-
   @if (consultando()) {
     <div class="loading-card">Calculando movimientos y saldos…</div>
   }

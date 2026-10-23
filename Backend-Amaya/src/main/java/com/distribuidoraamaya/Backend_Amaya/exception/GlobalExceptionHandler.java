@@ -1,5 +1,6 @@
 package com.distribuidoraamaya.Backend_Amaya.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,6 +36,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegal(IllegalArgumentException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        // Captura errores de base de datos como números de comprobante duplicados
+        return buildResponse(HttpStatus.BAD_REQUEST, "Ya existe un registro con esos datos. Verifica el número de comprobante o los campos únicos.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

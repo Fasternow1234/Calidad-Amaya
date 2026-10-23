@@ -1,9 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsuarioService } from '../../services/usuario.service';
 import { Rol, Usuario } from '../../models/usuario.models';
+
+function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+  const password = control.get('password')?.value;
+  const confirm = control.get('passwordConfirm')?.value;
+  if (password !== confirm) {
+    return { mismatch: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-usuarios',
@@ -26,13 +35,18 @@ export class UsuariosComponent implements OnInit {
   readonly mensaje = signal<string | null>(null);
   readonly error = signal<string | null>(null);
 
+  // Signals para el ojito
+  readonly showPassword = signal(false);
+  readonly showPasswordConfirm = signal(false);
+
   readonly form = this.fb.nonNullable.group({
     nombreEmpleado: ['', [Validators.required, Validators.maxLength(100)]],
     nombreUsuario: ['', [Validators.required, Validators.maxLength(50)]],
     email: ['', [Validators.email, Validators.maxLength(150)]],
     idRol: [0, [Validators.required, Validators.min(1)]],
-    password: ['', [Validators.minLength(8), Validators.maxLength(72)]]
-  });
+    password: ['', [Validators.minLength(8), Validators.maxLength(72)]],
+    passwordConfirm: ['', [Validators.minLength(8), Validators.maxLength(72)]]
+  }, { validators: passwordMatchValidator });
 
   ngOnInit(): void {
     this.cargar();
@@ -67,9 +81,13 @@ export class UsuariosComponent implements OnInit {
     this.editando.set(null);
     this.mensaje.set(null);
     this.error.set(null);
-    this.form.reset({ nombreEmpleado: '', nombreUsuario: '', email: '', idRol: 0, password: '' });
+    this.showPassword.set(false);
+    this.showPasswordConfirm.set(false);
+    this.form.reset({ nombreEmpleado: '', nombreUsuario: '', email: '', idRol: 0, password: '', passwordConfirm: '' });
     this.form.controls.password.setValidators([Validators.required, Validators.minLength(8), Validators.maxLength(72)]);
+    this.form.controls.passwordConfirm.setValidators([Validators.required, Validators.minLength(8), Validators.maxLength(72)]);
     this.form.controls.password.updateValueAndValidity();
+    this.form.controls.passwordConfirm.updateValueAndValidity();
     this.formularioVisible.set(true);
   }
 
@@ -77,15 +95,20 @@ export class UsuariosComponent implements OnInit {
     this.editando.set(usuario);
     this.mensaje.set(null);
     this.error.set(null);
+    this.showPassword.set(false);
+    this.showPasswordConfirm.set(false);
     this.form.reset({
       nombreEmpleado: usuario.nombreEmpleado,
       nombreUsuario: usuario.nombreUsuario,
       email: usuario.email ?? '',
       idRol: usuario.idRol,
-      password: ''
+      password: '',
+      passwordConfirm: ''
     });
     this.form.controls.password.setValidators([Validators.minLength(8), Validators.maxLength(72)]);
+    this.form.controls.passwordConfirm.setValidators([Validators.minLength(8), Validators.maxLength(72)]);
     this.form.controls.password.updateValueAndValidity();
+    this.form.controls.passwordConfirm.updateValueAndValidity();
     this.formularioVisible.set(true);
   }
 
@@ -95,24 +118,44 @@ export class UsuariosComponent implements OnInit {
     this.error.set(null);
   }
 
+  togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
+
+  togglePasswordConfirm(): void {
+    this.showPasswordConfirm.update(v => !v);
+  }
+
   guardar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+
     const v = this.form.getRawValue();
+    
+    // Validación extra manual por si acaso (aunque el validador de grupo ya lo hace)
+    if (v.password !== v.passwordConfirm) {
+      this.error.set('Las contraseñas no coinciden.');
+      return;
+    }
+
     const request = {
-      ...v,
-      idRol: Number(v.idRol),
+      nombreUsuario: v.nombreUsuario,
+      nombreEmpleado: v.nombreEmpleado,
       email: v.email.trim() || null,
+      idRol: Number(v.idRol),
       password: v.password || null
     };
+
     this.guardando.set(true);
     this.error.set(null);
     const usuario = this.editando();
+    
     const peticion = usuario
       ? this.usuarioService.actualizar(usuario.id, request)
       : this.usuarioService.crear(request);
+      
     peticion.subscribe({
       next: resultado => {
         this.usuarios.update(lista => {

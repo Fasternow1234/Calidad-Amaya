@@ -2,7 +2,6 @@ package com.distribuidoraamaya.Backend_Amaya.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,7 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Comprobante {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +23,7 @@ public class Comprobante {
     @Column(name = "tipo", nullable = false, length = 10)
     private TipoComprobante tipo;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, unique = true, length = 30)
     private String numero;
 
     @Column(name = "fecha_emision", nullable = false)
