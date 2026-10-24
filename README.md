@@ -8,4 +8,4 @@ instalar npm install - Angular
 
 Importar bd_amaya
 
-(Modifiar con su usuario y contraseña de mysql) application.properties
+(Modificar con su usuario y contraseña de mysql) application.properties
