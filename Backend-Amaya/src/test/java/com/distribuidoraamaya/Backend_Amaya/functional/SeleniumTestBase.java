@@ -47,6 +47,7 @@ abstract class SeleniumTestBase {
     @AfterEach
     void cerrarNavegador() {
         if (driver != null) {
+            pausarDemostracion();
             driver.quit();
         }
     }

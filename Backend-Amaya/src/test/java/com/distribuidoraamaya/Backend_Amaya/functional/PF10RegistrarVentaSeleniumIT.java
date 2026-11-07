@@ -75,7 +75,6 @@ class PF10RegistrarVentaSeleniumIT extends SeleniumTestBase {
             assertEquals(0, stockInicial.subtract(BigDecimal.ONE).compareTo(decimalDeCelda(columnasStock.get(1))));
 
             guardarCaptura("PF-10-venta-y-salida-" + numeroEsperado.replace('-', '_') + ".png");
-            pausarDemostracion();
         } catch (RuntimeException | AssertionError error) {
             guardarCaptura("PF-10-venta-fallida.png");
             throw error;
