@@ -12,6 +12,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,8 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
- * Prueba funcional de HU-08. Requiere frontend, backend y MySQL en ejecucion.
+ * Prueba funcional del flujo HU-01, HU-05, HU-06, HU-08, HU-10 y HU-11.
+ * Requiere frontend, backend y MySQL en ejecucion.
  *
  * Se llama IT para evitar que Maven la ejecute junto con las pruebas unitarias.
  * La ejecucion registra una venta real en el ambiente configurado y descuenta
@@ -37,14 +39,14 @@ class RegistroComprobanteVentaSeleniumIT {
 
     private static final String URL_BASE = valor("selenium.baseUrl", "SELENIUM_BASE_URL", "http://localhost:4200");
     private static final String USUARIO = valor("selenium.usuario", "SELENIUM_USUARIO", "admin");
-    private static final String PASSWORD = valor("selenium.password", "SELENIUM_PASSWORD", "");
+    private static final String PASSWORD = valor("selenium.password", "SELENIUM_PASSWORD", "admin123");
     private static final String DNI_CLIENTE = valor("selenium.clienteDni", "SELENIUM_CLIENTE_DNI", "98645128");
     private static final String PRODUCTO = valor("selenium.producto", "SELENIUM_PRODUCTO", "Ariel");
-    private static final String STOCK_ESPERADO = valor("selenium.stockEsperado", "SELENIUM_STOCK_ESPERADO", "10");
+    private static final String STOCK_ESPERADO = valor("selenium.stockEsperado", "SELENIUM_STOCK_ESPERADO", "6");
     private static final BigDecimal PRECIO_ESPERADO = new BigDecimal(
             valor("selenium.precioEsperado", "SELENIUM_PRECIO_ESPERADO", "5.00"));
     private static final long PAUSA_DEMOSTRACION_MS = Long.parseLong(
-            valor("selenium.pausaMs", "SELENIUM_PAUSA_MS", "0"));
+            valor("selenium.pausaMs", "SELENIUM_PAUSA_MS", "3000"));
 
     private WebDriver driver;
 
@@ -127,7 +129,41 @@ class RegistroComprobanteVentaSeleniumIT {
             assertEquals("Comprobante registrado correctamente", mensaje.getText().trim());
             espera.until(ExpectedConditions.textToBePresentInElementLocated(By.tagName("body"), numeroEsperado));
 
-            guardarCaptura("venta-aprobada-" + numeroEsperado.replace('-', '_') + ".png");
+            // Comprobar HU-10: la venta genero una salida y redujo el stock.
+            WebElement menuMovimientos = espera.until(ExpectedConditions.elementToBeClickable(By.xpath(
+                    "//button[contains(@class,'nav-item')][.//span[normalize-space()='Movimientos']]")));
+            menuMovimientos.click();
+            espera.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("app-movimientos")));
+
+            WebElement buscadorMovimiento = espera.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.cssSelector("app-movimientos input.buscador-input")));
+            escribir(buscadorMovimiento, numeroEsperado);
+
+            WebElement filaMovimiento = espera.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.cssSelector("app-movimientos table.tabla tbody tr")));
+            assertEquals(PRODUCTO,
+                    filaMovimiento.findElement(By.cssSelector("td.nombre-producto")).getText().trim(),
+                    "El movimiento debe corresponder al producto vendido.");
+            assertEquals("Salida",
+                    filaMovimiento.findElement(By.cssSelector("td.col-tipo")).getText().trim(),
+                    "La venta debe generar un movimiento de salida.");
+
+            String cantidadMovimiento = filaMovimiento
+                    .findElement(By.cssSelector("td.col-cantidad"))
+                    .getText().trim();
+            assertTrue(cantidadMovimiento.matches("^1(?:[.,]0+)?\\s+.*"),
+                    "La salida debe registrar una unidad. Valor encontrado: " + cantidadMovimiento);
+
+            List<WebElement> columnasStock = filaMovimiento.findElements(By.cssSelector("td.col-stock"));
+            assertEquals(2, columnasStock.size(),
+                    "El movimiento debe mostrar el stock anterior y el stock nuevo.");
+            BigDecimal stockInicial = new BigDecimal(STOCK_ESPERADO);
+            assertEquals(0, stockInicial.compareTo(decimalDeCelda(columnasStock.get(0))),
+                    "El stock anterior del movimiento no coincide con el dato de prueba.");
+            assertEquals(0, stockInicial.subtract(BigDecimal.ONE).compareTo(decimalDeCelda(columnasStock.get(1))),
+                    "El stock final debe disminuir exactamente una unidad.");
+
+            guardarCaptura("venta-y-salida-aprobadas-" + numeroEsperado.replace('-', '_') + ".png");
             pausarDemostracion();
         } catch (RuntimeException | AssertionError error) {
             guardarCaptura("venta-fallida.png");
@@ -137,8 +173,16 @@ class RegistroComprobanteVentaSeleniumIT {
 
     private void escribir(By localizador, String texto) {
         WebElement campo = driver.findElement(localizador);
+        escribir(campo, texto);
+    }
+
+    private void escribir(WebElement campo, String texto) {
         campo.clear();
         campo.sendKeys(texto);
+    }
+
+    private BigDecimal decimalDeCelda(WebElement celda) {
+        return new BigDecimal(celda.getText().trim().replace(',', '.'));
     }
 
     private String seleccionarOpcionQueContiene(
